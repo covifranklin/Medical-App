@@ -41,12 +41,13 @@ export async function GET(
           take: 10,
         },
         treatmentPlans: {
-          orderBy: { createdAt: "desc" },
+          orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
           select: {
             id: true,
             title: true,
             prescribedBy: true,
             frequency: true,
+            isActive: true,
             startDate: true,
             createdAt: true,
           },
@@ -80,6 +81,7 @@ export async function GET(
         title: plan.title,
         prescribedBy: plan.prescribedBy,
         frequency: plan.frequency,
+        isActive: plan.isActive,
         startDate: plan.startDate.toISOString().split("T")[0],
         createdAt: plan.createdAt.toISOString(),
       })),

@@ -98,6 +98,7 @@ model TreatmentPlan {
   prescribedBy String?           // who prescribed it
   frequency    ExerciseFrequency @default(DAILY)
   startDate    DateTime          @default(now())
+  isActive     Boolean           @default(true)
   rawContent   String?           // pasted or extracted plan text
   aiReview     Json?             // structured AI analysis
   reviewedAt   DateTime?

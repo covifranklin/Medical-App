@@ -99,6 +99,14 @@ export default function RegionDetailPanel({
                     <p className="mt-2 text-xs text-gray-400">No pain logs recorded</p>
                   )}
 
+                  {ailment.activePlanCount > 0 && (
+                    <div className="mt-1.5">
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800">
+                        {ailment.activePlanCount} active plan{ailment.activePlanCount !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="mt-2 flex gap-2">
                     <Link
                       href={`/conditions/${ailment.id}`}

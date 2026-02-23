@@ -19,6 +19,7 @@ interface TreatmentPlanEntry {
   title: string;
   prescribedBy: string | null;
   frequency: string;
+  isActive: boolean;
   startDate: string;
   createdAt: string;
 }
@@ -300,34 +301,52 @@ export default function AilmentDetailPage({
 
       {/* Treatment plans */}
       <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-900 mb-3">
-          Treatment Plans
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-900">
+            Treatment Plans
+          </h2>
+          <Link
+            href={`/conditions/${ailment.id}/plans/new`}
+            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700"
+          >
+            + Add Treatment Plan
+          </Link>
+        </div>
         {ailment.treatmentPlans.length === 0 ? (
           <p className="text-sm text-gray-500">
-            No treatment plans linked yet. Treatment plan management is coming
-            in Phase 2.
+            No treatment plans linked yet.
           </p>
         ) : (
           <ul className="space-y-2">
             {ailment.treatmentPlans.map((plan) => (
-              <li
-                key={plan.id}
-                className="flex items-center justify-between rounded-md border border-gray-100 px-3 py-2"
-              >
-                <div>
-                  <span className="text-sm font-medium text-gray-900">
-                    {plan.title}
-                  </span>
-                  {plan.prescribedBy && (
-                    <span className="ml-2 text-xs text-gray-500">
-                      by {plan.prescribedBy}
+              <li key={plan.id}>
+                <Link
+                  href={`/plans/${plan.id}`}
+                  className="flex items-center justify-between rounded-md border border-gray-100 px-3 py-2 hover:border-gray-300 hover:bg-gray-50 transition-all"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900">
+                      {plan.title}
                     </span>
-                  )}
-                </div>
-                <span className="text-xs text-gray-400">
-                  {plan.frequency.toLowerCase()} — since {plan.startDate}
-                </span>
+                    {plan.isActive ? (
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-800">
+                        active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
+                        inactive
+                      </span>
+                    )}
+                    {plan.prescribedBy && (
+                      <span className="text-xs text-gray-500">
+                        by {plan.prescribedBy}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {plan.frequency.toLowerCase()} — since {plan.startDate}
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
