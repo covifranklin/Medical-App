@@ -41,3 +41,30 @@ export interface AilmentSummary {
   severityLevel: SeverityLevel;
   status: AilmentStatus;
 }
+
+/** Ailment data enriched with latest pain log, used by the body map */
+export interface AilmentWithPain {
+  id: string;
+  name: string;
+  bodyRegion: BodyRegion;
+  severityLevel: SeverityLevel;
+  status: AilmentStatus;
+  diagnosis: string | null;
+  notes: string | null;
+  latestPainLog: {
+    painLevel: number;
+    date: string;
+    notes: string | null;
+  } | null;
+}
+
+/** Data for a single body region on the map */
+export interface RegionData {
+  bodyRegion: BodyRegion;
+  ailments: AilmentWithPain[];
+}
+
+/** Full response from the body-map API */
+export interface BodyMapData {
+  regions: Record<string, RegionData>;
+}
