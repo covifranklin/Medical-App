@@ -1,12 +1,13 @@
-export const DAILY_ROUTINE_SYSTEM = `You are a physiotherapy exercise prioritisation assistant. Given a patient's active conditions, available exercises, and time budget, generate an optimal daily exercise routine.
+export const DAILY_PLAN_SYSTEM = `You are a physiotherapy exercise prioritisation assistant. Given a patient's active ailments, available exercises, and time budget, generate an optimal daily exercise plan.
 
 Prioritise based on:
-1. Severity of condition (higher severity = higher priority)
+1. Severity of ailment (higher severity = higher priority)
 2. Exercise frequency requirements
 3. Balancing different body regions
 4. Total time fitting within the budget
+5. Contraindications — never include exercises that conflict
 
-Return your routine as JSON with this structure:
+Return your plan as JSON with this structure:
 {
   "exercises": [
     {
@@ -26,33 +27,33 @@ Return your routine as JSON with this structure:
   "notes": "Any general advice for today's session"
 }`;
 
-export function buildDailyRoutinePrompt(
-  conditions: Array<{ name: string; severity: number; bodyRegion: string }>,
+export function buildDailyPlanPrompt(
+  ailments: Array<{ name: string; severityLevel: string; bodyRegion: string }>,
   exercises: Array<{
     id: string;
     name: string;
     sets?: number | null;
     reps?: number | null;
-    durationSecs?: number | null;
+    durationMinutes: number;
     frequency: string;
-    priority: number;
     bodyRegion: string;
-    conditionName: string;
+    contraindications?: string | null;
+    ailmentName: string;
   }>,
   timeBudgetMinutes: number
 ): string {
-  return `Generate a daily exercise routine with a ${timeBudgetMinutes}-minute time budget.
+  return `Generate a daily exercise plan with a ${timeBudgetMinutes}-minute time budget.
 
-Active conditions:
-${conditions.map((c) => `- ${c.name} (${c.bodyRegion}, severity: ${c.severity}/10)`).join("\n")}
+Active ailments:
+${ailments.map((a) => `- ${a.name} (${a.bodyRegion}, severity: ${a.severityLevel})`).join("\n")}
 
 Available exercises:
 ${exercises
   .map(
     (e) =>
-      `- [${e.id}] ${e.name} (for ${e.conditionName}, ${e.bodyRegion}, priority: ${e.priority}/10, frequency: ${e.frequency}${e.sets ? `, ${e.sets}x${e.reps}` : ""}${e.durationSecs ? `, ${e.durationSecs}s` : ""})`
+      `- [${e.id}] ${e.name} (for ${e.ailmentName}, ${e.bodyRegion}, ~${e.durationMinutes}min, frequency: ${e.frequency}${e.sets ? `, ${e.sets}x${e.reps}` : ""}${e.contraindications ? `, contraindicated: ${e.contraindications}` : ""})`
   )
   .join("\n")}
 
-Return the routine as the specified JSON structure.`;
+Return the plan as the specified JSON structure.`;
 }

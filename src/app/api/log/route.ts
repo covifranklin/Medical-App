@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-// POST /api/log — log exercise completion with pain tracking
+// POST /api/log — create a pain log entry
 export async function POST() {
-  // TODO: Phase 3 — create exercise log entry
+  // TODO: Phase 3 — create pain log entry in database
   return NextResponse.json({ message: "Not implemented" }, { status: 501 });
 }

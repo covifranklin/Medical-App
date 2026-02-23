@@ -32,10 +32,11 @@ enum BodyRegion {
   RIGHT_FOOT
 }
 
-enum ConditionStatus {
-  ACTIVE
-  MANAGED
-  RESOLVED
+enum SeverityLevel {
+  MILD        // 1-3
+  MODERATE    // 4-6
+  SEVERE      // 7-8
+  CRITICAL    // 9-10
 }
 
 enum ExerciseFrequency {
@@ -45,84 +46,123 @@ enum ExerciseFrequency {
   AS_NEEDED
 }
 
-enum RoutineSource {
+enum AilmentStatus {
+  ACTIVE
+  MANAGED
+  RESOLVED
+}
+
+enum DailyPlanSource {
   AI
   MANUAL
 }
 
 // ── Models ─────────────────────────────────────────────
 
-model Condition {
-  id          String          @id @default(uuid())
-  name        String
-  bodyRegion  BodyRegion
-  severity    Int             @default(5) // 1-10
-  status      ConditionStatus @default(ACTIVE)
-  diagnosedAt DateTime?
-  notes       String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String   // hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ailments   Ailment[]
+  dailyPlans DailyPlan[]
+  painLogs   PainLog[]
+}
+
+model Ailment {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String        // e.g. "Lower back disc herniation"
+  bodyRegion     BodyRegion
+  severityLevel  SeverityLevel @default(MODERATE)
+  status         AilmentStatus @default(ACTIVE)
+  diagnosis      String?       // clinical diagnosis details
+  dateDiagnosed  DateTime?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   treatmentPlans TreatmentPlan[]
+  painLogs       PainLog[]
 }
 
 model TreatmentPlan {
-  id          String    @id @default(uuid())
-  conditionId String
-  condition   Condition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
-  title       String
-  source      String?   // who prescribed it
-  rawContent  String    // pasted or extracted plan text
-  aiReview    Json?     // structured AI analysis
-  reviewedAt  DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String            @id @default(uuid())
+  ailmentId    String
+  ailment      Ailment           @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
+  title        String            // e.g. "Physio plan from Dr. Smith"
+  prescribedBy String?           // who prescribed it
+  frequency    ExerciseFrequency @default(DAILY)
+  startDate    DateTime          @default(now())
+  rawContent   String?           // pasted or extracted plan text
+  aiReview     Json?             // structured AI analysis
+  reviewedAt   DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
   exercises Exercise[]
 }
 
 model Exercise {
-  id              String            @id @default(uuid())
-  treatmentPlanId String
-  treatmentPlan   TreatmentPlan     @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
-  name            String
-  description     String?
-  sets            Int?
-  reps            Int?
-  durationSecs    Int?              // for timed exercises
-  frequency       ExerciseFrequency @default(DAILY)
-  priority        Int               @default(5) // 1-10
-  bodyRegion      BodyRegion
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                String     @id @default(uuid())
+  treatmentPlanId   String
+  treatmentPlan     TreatmentPlan @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  name              String     // e.g. "Bird-dog hold"
+  description       String?
+  targetBodyRegion  BodyRegion
+  contraindications String?    // when NOT to do this exercise
+  durationMinutes   Int        @default(5)
+  sets              Int?
+  reps              Int?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
-  exerciseLogs ExerciseLog[]
+  dailyPlanExercises DailyPlanExercise[]
 }
 
-model DailyRoutine {
-  id           String        @id @default(uuid())
-  date         DateTime      @db.Date
-  exercises    Json          // ordered list of exercise refs + status
-  generatedBy  RoutineSource @default(AI)
-  totalMinutes Int           @default(30)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+model PainLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ailmentId String
+  ailment   Ailment  @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
+  painLevel Int      // 1-10
+  notes     String?
+  date      DateTime @db.Date
+  createdAt DateTime @default(now())
 
-  exerciseLogs ExerciseLog[]
-
-  @@unique([date])
+  @@unique([userId, ailmentId, date])
 }
 
-model ExerciseLog {
-  id             String       @id @default(uuid())
-  dailyRoutineId String
-  dailyRoutine   DailyRoutine @relation(fields: [dailyRoutineId], references: [id], onDelete: Cascade)
-  exerciseId     String
-  exercise       Exercise     @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
-  completed      Boolean      @default(false)
-  painBefore     Int?         // 1-10
-  painAfter      Int?         // 1-10
-  notes          String?
-  completedAt    DateTime?
-  createdAt      DateTime     @default(now())
+model DailyPlan {
+  id           String          @id @default(uuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime        @db.Date
+  source       DailyPlanSource @default(AI)
+  totalMinutes Int             @default(30)
+  notes        String?         // AI-generated notes/advice
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  exercises DailyPlanExercise[]
+
+  @@unique([userId, date])
+}
+
+model DailyPlanExercise {
+  id              String    @id @default(uuid())
+  dailyPlanId     String
+  dailyPlan       DailyPlan @relation(fields: [dailyPlanId], references: [id], onDelete: Cascade)
+  exerciseId      String
+  exercise        Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  orderIndex      Int       // position in the daily routine
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  estimatedMinutes Int      @default(5)
+  reason          String?   // why AI included this exercise
 }

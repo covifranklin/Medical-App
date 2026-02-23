@@ -12,11 +12,11 @@ Return your analysis as JSON with this structure:
 }`;
 
 export function buildPlanReviewPrompt(
-  conditionName: string,
+  ailmentName: string,
   bodyRegion: string,
   planContent: string
 ): string {
-  return `Review this treatment plan for: ${conditionName} (${bodyRegion})
+  return `Review this treatment plan for: ${ailmentName} (${bodyRegion})
 
 Treatment plan:
 ${planContent}

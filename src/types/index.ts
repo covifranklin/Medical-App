@@ -1,12 +1,10 @@
-import type { BodyRegion, ConditionStatus } from "@prisma/client";
-
-export type SeverityLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 export interface BodyMapRegion {
   id: BodyRegion;
   label: string;
-  severity: SeverityLevel | null;
-  conditionCount: number;
+  severityLevel: SeverityLevel | null;
+  ailmentCount: number;
 }
 
 export interface AIReviewResult {
@@ -19,15 +17,15 @@ export interface AIReviewResult {
   safetyFlags: string[];
 }
 
-export interface DailyRoutineExercise {
+export interface DailyPlanExerciseItem {
   exerciseId: string;
   order: number;
   estimatedMinutes: number;
   reason: string;
 }
 
-export interface GeneratedRoutine {
-  exercises: DailyRoutineExercise[];
+export interface GeneratedDailyPlan {
+  exercises: DailyPlanExerciseItem[];
   totalMinutes: number;
   skippedExercises: Array<{
     exerciseId: string;
@@ -36,10 +34,10 @@ export interface GeneratedRoutine {
   notes: string;
 }
 
-export interface ConditionSummary {
+export interface AilmentSummary {
   id: string;
   name: string;
   bodyRegion: BodyRegion;
-  severity: number;
-  status: ConditionStatus;
+  severityLevel: SeverityLevel;
+  status: AilmentStatus;
 }
