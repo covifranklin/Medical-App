@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ──────────────────────────────────────────────
+
+enum BodyRegion {
+  HEAD
+  NECK
+  LEFT_SHOULDER
+  RIGHT_SHOULDER
+  UPPER_BACK
+  LOWER_BACK
+  CHEST
+  LEFT_ARM
+  RIGHT_ARM
+  LEFT_HAND
+  RIGHT_HAND
+  LEFT_WRIST
+  RIGHT_WRIST
+  LEFT_HIP
+  RIGHT_HIP
+  LEFT_KNEE
+  RIGHT_KNEE
+  LEFT_ANKLE
+  RIGHT_ANKLE
+  LEFT_FOOT
+  RIGHT_FOOT
+}
+
+enum SeverityLevel {
+  MILD        // 1-3
+  MODERATE    // 4-6
+  SEVERE      // 7-8
+  CRITICAL    // 9-10
+}
+
+enum ExerciseFrequency {
+  DAILY
+  ALTERNATE_DAYS
+  WEEKLY
+  AS_NEEDED
+}
+
+enum AilmentStatus {
+  ACTIVE
+  MANAGED
+  RESOLVED
+}
+
+enum DailyPlanSource {
+  AI
+  MANUAL
+}
+
+// ── Models ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String   // hashed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ailments   Ailment[]
+  dailyPlans DailyPlan[]
+  painLogs   PainLog[]
+}
+
+model Ailment {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String        // e.g. "Lower back disc herniation"
+  bodyRegion     BodyRegion
+  severityLevel  SeverityLevel @default(MODERATE)
+  status         AilmentStatus @default(ACTIVE)
+  diagnosis      String?       // clinical diagnosis details
+  dateDiagnosed  DateTime?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  treatmentPlans TreatmentPlan[]
+  painLogs       PainLog[]
+}
+
+model TreatmentPlan {
+  id           String            @id @default(uuid())
+  ailmentId    String
+  ailment      Ailment           @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
+  title        String            // e.g. "Physio plan from Dr. Smith"
+  prescribedBy String?           // who prescribed it
+  frequency    ExerciseFrequency @default(DAILY)
+  startDate    DateTime          @default(now())
+  rawContent   String?           // pasted or extracted plan text
+  aiReview     Json?             // structured AI analysis
+  reviewedAt   DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  exercises Exercise[]
+}
+
+model Exercise {
+  id                String     @id @default(uuid())
+  treatmentPlanId   String
+  treatmentPlan     TreatmentPlan @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  name              String     // e.g. "Bird-dog hold"
+  description       String?
+  targetBodyRegion  BodyRegion
+  contraindications String?    // when NOT to do this exercise
+  durationMinutes   Int        @default(5)
+  sets              Int?
+  reps              Int?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  dailyPlanExercises DailyPlanExercise[]
+}
+
+model PainLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ailmentId String
+  ailment   Ailment  @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
+  painLevel Int      // 1-10
+  notes     String?
+  date      DateTime @db.Date
+  createdAt DateTime @default(now())
+
+  @@unique([userId, ailmentId, date])
+}
+
+model DailyPlan {
+  id           String          @id @default(uuid())
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime        @db.Date
+  source       DailyPlanSource @default(AI)
+  totalMinutes Int             @default(30)
+  notes        String?         // AI-generated notes/advice
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  exercises DailyPlanExercise[]
+
+  @@unique([userId, date])
+}
+
+model DailyPlanExercise {
+  id              String    @id @default(uuid())
+  dailyPlanId     String
+  dailyPlan       DailyPlan @relation(fields: [dailyPlanId], references: [id], onDelete: Cascade)
+  exerciseId      String
+  exercise        Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  orderIndex      Int       // position in the daily routine
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  estimatedMinutes Int      @default(5)
+  reason          String?   // why AI included this exercise
+}
