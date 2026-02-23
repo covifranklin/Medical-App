@@ -12,6 +12,7 @@ interface BodyMapState {
   setRegions: (regions: Record<string, RegionData>) => void;
   setLoading: (loading: boolean) => void;
   getAilmentsForRegion: (region: BodyRegion) => AilmentWithPain[];
+  refreshRegions: () => Promise<void>;
 }
 
 export const useBodyMapStore = create<BodyMapState>((set, get) => ({
@@ -25,5 +26,16 @@ export const useBodyMapStore = create<BodyMapState>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   getAilmentsForRegion: (region) => {
     return get().regions[region]?.ailments ?? [];
+  },
+  refreshRegions: async () => {
+    try {
+      const res = await fetch("/api/body-map");
+      if (res.ok) {
+        const data = await res.json();
+        set({ regions: data.regions });
+      }
+    } catch (err) {
+      console.error("Failed to refresh body map data:", err);
+    }
   },
 }));
