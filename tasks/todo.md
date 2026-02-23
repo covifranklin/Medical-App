@@ -26,9 +26,10 @@
 - [x] **Ailments list page** — filterable by status (All/Active/Managed/Resolved) with severity/status badges
 - [x] **Ailment detail page** — full detail view with edit-in-place, delete confirmation, pain logs, treatment plans
 - [x] **Link body map to ailment creation** — click region → "Add ailment here" link pre-fills bodyRegion
-- [ ] **Pain log CRUD** — daily pain logging per ailment
+- [x] **Pain log CRUD** — batch upsert API, daily check-in page with sliders + "Normal Day" quick-log
+- [x] **Body map refresh** — Zustand `refreshRegions()` after check-in updates dashboard colours
 
-**Status: ~90% complete** — only pain log CRUD remains for Phase 1.
+**Status: COMPLETE**
 
 ---
 
@@ -105,7 +106,8 @@
 | Ailments list page | `src/app/conditions/page.tsx` | Done |
 | New ailment page | `src/app/conditions/new/page.tsx` | Done |
 | Ailment detail page | `src/app/conditions/[id]/page.tsx` | Done |
-| Pain log CRUD | — | Pending |
+| Pain log API (batch upsert) | `src/app/api/pain-logs/route.ts` | Done |
+| Daily check-in page | `src/app/check-in/page.tsx` | Done |
 | Treatment plan CRUD | — | Phase 2 |
 | AI plan review | — | Phase 2 |
 | Daily plan generation | — | Phase 3 |
