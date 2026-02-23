@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BodyMap from "@/components/body-map/BodyMap";
+import DashboardSummary from "@/components/dashboard/DashboardSummary";
 
 export default function DashboardPage() {
   return (
@@ -19,6 +20,7 @@ export default function DashboardPage() {
         </Link>
       </div>
       <BodyMap />
+      <DashboardSummary />
     </div>
   );
 }
