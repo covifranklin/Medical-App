@@ -98,6 +98,21 @@ export default function RegionDetailPanel({
                   ) : (
                     <p className="mt-2 text-xs text-gray-400">No pain logs recorded</p>
                   )}
+
+                  <div className="mt-2 flex gap-2">
+                    <Link
+                      href={`/conditions/${ailment.id}`}
+                      className="inline-flex items-center rounded px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    <Link
+                      href="/check-in"
+                      className="inline-flex items-center rounded px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+                    >
+                      Log pain
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
