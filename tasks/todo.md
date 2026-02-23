@@ -21,11 +21,15 @@
 - [x] `GET /api/body-map` endpoint — ailments grouped by region with latest pain log
 - [x] Zustand store for body map state (selected/hovered region, data)
 - [x] Basic nav and layout
-- [ ] **Ailment CRUD** — create/edit/delete ailments (API routes + forms)
-- [ ] **Pain log CRUD** — daily pain logging per ailment
-- [ ] **Link body map to ailment creation** — click empty region → add ailment flow
+- [x] **Ailment CRUD** — API routes (GET all, POST, GET one, PUT, DELETE) with server-side validation
+- [x] **AilmentForm component** — create/edit form with body region dropdown, severity, status, diagnosis, date, notes
+- [x] **Ailments list page** — filterable by status (All/Active/Managed/Resolved) with severity/status badges
+- [x] **Ailment detail page** — full detail view with edit-in-place, delete confirmation, pain logs, treatment plans
+- [x] **Link body map to ailment creation** — click region → "Add ailment here" link pre-fills bodyRegion
+- [x] **Pain log CRUD** — batch upsert API, daily check-in page with sliders + "Normal Day" quick-log
+- [x] **Body map refresh** — Zustand `refreshRegions()` after check-in updates dashboard colours
 
-**Status: ~75% complete** — body map is functional with data display; CRUD forms remain.
+**Status: COMPLETE**
 
 ---
 
@@ -97,8 +101,13 @@
 | Anthropic SDK client | `src/lib/ai.ts` | Done |
 | AI prompts | `src/lib/prompts/` | Done |
 | Types | `src/types/index.ts` | Done |
-| Ailment CRUD | — | **Next up** |
-| Pain log CRUD | — | Pending |
+| Ailment API (CRUD) | `src/app/api/ailments/` | Done |
+| AilmentForm component | `src/components/ailments/AilmentForm.tsx` | Done |
+| Ailments list page | `src/app/conditions/page.tsx` | Done |
+| New ailment page | `src/app/conditions/new/page.tsx` | Done |
+| Ailment detail page | `src/app/conditions/[id]/page.tsx` | Done |
+| Pain log API (batch upsert) | `src/app/api/pain-logs/route.ts` | Done |
+| Daily check-in page | `src/app/check-in/page.tsx` | Done |
 | Treatment plan CRUD | — | Phase 2 |
 | AI plan review | — | Phase 2 |
 | Daily plan generation | — | Phase 3 |
