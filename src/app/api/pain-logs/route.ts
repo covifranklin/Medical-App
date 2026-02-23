@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/session";
 
 // GET /api/pain-logs?date=2026-02-23&ailmentId=xxx
 export async function GET(request: NextRequest) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const { searchParams } = request.nextUrl;
     const date = searchParams.get("date");
     const ailmentId = searchParams.get("ailmentId");
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { userId };
 
     if (date) {
       const d = new Date(date);
@@ -64,6 +68,9 @@ interface PainLogEntry {
 // Body: { entries: PainLogEntry[] }
 export async function POST(request: NextRequest) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const body = await request.json();
     const entries: PainLogEntry[] = body.entries;
 
@@ -104,21 +111,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Single-user mode: get or create the default user
-    const user = await prisma.user.upsert({
-      where: { email: "default@physiotracker.local" },
-      update: {},
-      create: {
-        email: "default@physiotracker.local",
-        name: "Default User",
-        password: "not-set",
-      },
-    });
-
-    // Verify all ailment IDs exist
+    // Verify all ailment IDs exist and belong to this user
     const ailmentIds = Array.from(new Set(entries.map((e) => e.ailmentId)));
     const existingAilments = await prisma.ailment.findMany({
-      where: { id: { in: ailmentIds } },
+      where: { id: { in: ailmentIds }, userId },
       select: { id: true },
     });
     const existingIds = new Set(existingAilments.map((a) => a.id));
@@ -144,7 +140,7 @@ export async function POST(request: NextRequest) {
         return prisma.painLog.upsert({
           where: {
             userId_ailmentId_date: {
-              userId: user.id,
+              userId,
               ailmentId: e.ailmentId,
               date: dateOnly,
             },
@@ -154,7 +150,7 @@ export async function POST(request: NextRequest) {
             notes: e.notes?.trim() || null,
           },
           create: {
-            userId: user.id,
+            userId,
             ailmentId: e.ailmentId,
             painLevel: e.painLevel,
             notes: e.notes?.trim() || null,

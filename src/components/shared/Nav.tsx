@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 
 const navItems = [
   { href: "/", label: "Body Map" },
@@ -14,6 +15,10 @@ const navItems = [
 
 export default function Nav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  // Don't show nav on auth page
+  if (pathname === "/auth") return null;
 
   return (
     <nav className="border-b border-gray-200 bg-white">
@@ -22,7 +27,7 @@ export default function Nav() {
           <Link href="/" className="text-lg font-semibold text-gray-900">
             PhysioTracker
           </Link>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
             {navItems.map((item) => {
               const isActive =
                 item.href === "/"
@@ -42,6 +47,19 @@ export default function Nav() {
                 </Link>
               );
             })}
+            {session?.user && (
+              <>
+                <span className="ml-3 border-l border-gray-200 pl-3 text-sm text-gray-500">
+                  {session.user.name}
+                </span>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/auth" })}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

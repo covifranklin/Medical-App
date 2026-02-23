@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/session";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -18,19 +19,22 @@ function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/ailments/:id — fetch a single ailment with pain logs and treatment plans
+// GET /api/ailments/:id — fetch a single ailment (scoped to user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const { id } = params;
     if (!isValidUUID(id)) {
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const ailment = await prisma.ailment.findUnique({
-      where: { id },
+    const ailment = await prisma.ailment.findFirst({
+      where: { id, userId },
       include: {
         painLogs: {
           orderBy: { date: "desc" },
@@ -89,18 +93,21 @@ export async function GET(
   }
 }
 
-// PUT /api/ailments/:id — update an ailment
+// PUT /api/ailments/:id — update an ailment (scoped to user)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const { id } = params;
     if (!isValidUUID(id)) {
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const existing = await prisma.ailment.findUnique({ where: { id } });
+    const existing = await prisma.ailment.findFirst({ where: { id, userId } });
     if (!existing) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }
@@ -179,18 +186,21 @@ export async function PUT(
   }
 }
 
-// DELETE /api/ailments/:id — delete an ailment (cascades to pain logs & treatment plans)
+// DELETE /api/ailments/:id — delete an ailment (scoped to user)
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const { id } = params;
     if (!isValidUUID(id)) {
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const existing = await prisma.ailment.findUnique({ where: { id } });
+    const existing = await prisma.ailment.findFirst({ where: { id, userId } });
     if (!existing) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }

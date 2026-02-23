@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/session";
 import type { AilmentWithPain, RegionData } from "@/types";
 import type { BodyRegion } from "@prisma/client";
 
-// GET /api/body-map — fetch all ailments grouped by body region with latest pain logs
-// For single-user mode, we fetch the first user's data (or all if no user filter needed yet)
+// GET /api/body-map — fetch ailments grouped by body region for the authenticated user
 export async function GET() {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const ailments = await prisma.ailment.findMany({
       where: {
+        userId,
         status: { not: "RESOLVED" },
       },
       include: {

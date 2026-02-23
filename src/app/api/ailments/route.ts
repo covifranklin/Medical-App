@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/session";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -62,14 +63,17 @@ function validateAilmentInput(body: CreateAilmentBody) {
   return errors;
 }
 
-// GET /api/ailments — list all ailments with latest pain log
+// GET /api/ailments — list ailments for the authenticated user
 export async function GET(request: NextRequest) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const { searchParams } = request.nextUrl;
     const status = searchParams.get("status");
     const bodyRegion = searchParams.get("bodyRegion");
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { userId };
     if (status && AILMENT_STATUSES.includes(status as AilmentStatus)) {
       where.status = status;
     }
@@ -121,9 +125,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/ailments — create a new ailment
+// POST /api/ailments — create a new ailment for the authenticated user
 export async function POST(request: NextRequest) {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const body: CreateAilmentBody = await request.json();
     const errors = validateAilmentInput(body);
 
@@ -131,20 +138,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Single-user mode: get or create the default user
-    const user = await prisma.user.upsert({
-      where: { email: "default@physiotracker.local" },
-      update: {},
-      create: {
-        email: "default@physiotracker.local",
-        name: "Default User",
-        password: "not-set",
-      },
-    });
-
     const ailment = await prisma.ailment.create({
       data: {
-        userId: user.id,
+        userId,
         name: body.name!.trim(),
         bodyRegion: body.bodyRegion as BodyRegion,
         severityLevel: (body.severityLevel as SeverityLevel) ?? "MODERATE",

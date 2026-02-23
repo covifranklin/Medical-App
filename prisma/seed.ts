@@ -2,6 +2,7 @@ import "dotenv/config";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
+import { hashSync } from "bcryptjs";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -10,14 +11,15 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  // Upsert default user
+  // Upsert default user with a hashed password (password: "password123")
+  const hashedPassword = hashSync("password123", 10);
   const user = await prisma.user.upsert({
-    where: { email: "default@physiotracker.local" },
+    where: { email: "demo@physiotracker.local" },
     update: {},
     create: {
-      email: "default@physiotracker.local",
-      name: "Default User",
-      password: "not-set",
+      email: "demo@physiotracker.local",
+      name: "Demo User",
+      password: hashedPassword,
     },
   });
   console.log(`User: ${user.id} (${user.email})`);

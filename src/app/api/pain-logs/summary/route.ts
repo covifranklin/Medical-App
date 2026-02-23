@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { requireUserId } from "@/lib/session";
 
 // GET /api/pain-logs/summary
 // Returns: { loggedToday, ailments: [{ id, name, bodyRegion, severityLevel, status, latestPainLevel, trend }] }
 export async function GET() {
   try {
+    const userId = await requireUserId();
+    if (userId instanceof NextResponse) return userId;
+
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -12,9 +16,9 @@ export async function GET() {
     const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    // Get all non-resolved ailments
+    // Get non-resolved ailments for this user
     const ailments = await prisma.ailment.findMany({
-      where: { status: { not: "RESOLVED" } },
+      where: { userId, status: { not: "RESOLVED" } },
       include: {
         painLogs: {
           where: { date: { gte: weekAgo } },
