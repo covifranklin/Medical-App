@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { BodyRegion } from "@prisma/client";
 import type { AilmentWithPain } from "@/types";
 import { getRegionLabel } from "./regions";
@@ -48,49 +49,65 @@ export default function RegionDetailPanel({
 
       <div className="p-4">
         {ailments.length === 0 ? (
-          <p className="text-sm text-gray-500">No ailments recorded for this region.</p>
+          <div>
+            <p className="text-sm text-gray-500">No ailments recorded for this region.</p>
+            <Link
+              href={`/conditions/new?bodyRegion=${bodyRegion}`}
+              className="mt-3 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              + Add ailment here
+            </Link>
+          </div>
         ) : (
-          <ul className="space-y-4">
-            {ailments.map((ailment) => (
-              <li key={ailment.id} className="rounded-md border border-gray-100 p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-medium text-gray-900">{ailment.name}</h3>
-                  <div className="flex gap-1.5 shrink-0">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${SEVERITY_BADGE[ailment.severityLevel]}`}>
-                      {ailment.severityLevel.toLowerCase()}
-                    </span>
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[ailment.status]}`}>
-                      {ailment.status.toLowerCase()}
-                    </span>
-                  </div>
-                </div>
-
-                {ailment.diagnosis && (
-                  <p className="mt-1 text-xs text-gray-600">
-                    <span className="font-medium">Diagnosis:</span> {ailment.diagnosis}
-                  </p>
-                )}
-
-                {ailment.notes && (
-                  <p className="mt-1 text-xs text-gray-500">{ailment.notes}</p>
-                )}
-
-                {ailment.latestPainLog ? (
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-gray-500">Latest pain:</span>
-                      <PainLevelIndicator level={ailment.latestPainLog.painLevel} />
+          <>
+            <ul className="space-y-4">
+              {ailments.map((ailment) => (
+                <li key={ailment.id} className="rounded-md border border-gray-100 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <Link href={`/conditions/${ailment.id}`} className="text-sm font-medium text-gray-900 hover:text-blue-600">{ailment.name}</Link>
+                    <div className="flex gap-1.5 shrink-0">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${SEVERITY_BADGE[ailment.severityLevel]}`}>
+                        {ailment.severityLevel.toLowerCase()}
+                      </span>
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[ailment.status]}`}>
+                        {ailment.status.toLowerCase()}
+                      </span>
                     </div>
-                    <span className="text-xs text-gray-400">
-                      {ailment.latestPainLog.date}
-                    </span>
                   </div>
-                ) : (
-                  <p className="mt-2 text-xs text-gray-400">No pain logs recorded</p>
-                )}
-              </li>
-            ))}
-          </ul>
+
+                  {ailment.diagnosis && (
+                    <p className="mt-1 text-xs text-gray-600">
+                      <span className="font-medium">Diagnosis:</span> {ailment.diagnosis}
+                    </p>
+                  )}
+
+                  {ailment.notes && (
+                    <p className="mt-1 text-xs text-gray-500">{ailment.notes}</p>
+                  )}
+
+                  {ailment.latestPainLog ? (
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-gray-500">Latest pain:</span>
+                        <PainLevelIndicator level={ailment.latestPainLog.painLevel} />
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {ailment.latestPainLog.date}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-400">No pain logs recorded</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href={`/conditions/new?bodyRegion=${bodyRegion}`}
+              className="mt-3 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+            >
+              + Add ailment here
+            </Link>
+          </>
         )}
       </div>
     </div>
