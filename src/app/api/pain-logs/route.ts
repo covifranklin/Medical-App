@@ -104,17 +104,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Single-user mode: get the default user
-    let user = await prisma.user.findFirst();
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email: "default@physiotracker.local",
-          name: "Default User",
-          password: "not-set",
-        },
-      });
-    }
+    // Single-user mode: get or create the default user
+    const user = await prisma.user.upsert({
+      where: { email: "default@physiotracker.local" },
+      update: {},
+      create: {
+        email: "default@physiotracker.local",
+        name: "Default User",
+        password: "not-set",
+      },
+    });
 
     // Verify all ailment IDs exist
     const ailmentIds = Array.from(new Set(entries.map((e) => e.ailmentId)));
