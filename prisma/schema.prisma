@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ──────────────────────────────────────────────
+
+enum BodyRegion {
+  HEAD
+  NECK
+  LEFT_SHOULDER
+  RIGHT_SHOULDER
+  UPPER_BACK
+  LOWER_BACK
+  CHEST
+  LEFT_ARM
+  RIGHT_ARM
+  LEFT_HAND
+  RIGHT_HAND
+  LEFT_WRIST
+  RIGHT_WRIST
+  LEFT_HIP
+  RIGHT_HIP
+  LEFT_KNEE
+  RIGHT_KNEE
+  LEFT_ANKLE
+  RIGHT_ANKLE
+  LEFT_FOOT
+  RIGHT_FOOT
+}
+
+enum ConditionStatus {
+  ACTIVE
+  MANAGED
+  RESOLVED
+}
+
+enum ExerciseFrequency {
+  DAILY
+  ALTERNATE_DAYS
+  WEEKLY
+  AS_NEEDED
+}
+
+enum RoutineSource {
+  AI
+  MANUAL
+}
+
+// ── Models ─────────────────────────────────────────────
+
+model Condition {
+  id          String          @id @default(uuid())
+  name        String
+  bodyRegion  BodyRegion
+  severity    Int             @default(5) // 1-10
+  status      ConditionStatus @default(ACTIVE)
+  diagnosedAt DateTime?
+  notes       String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  treatmentPlans TreatmentPlan[]
+}
+
+model TreatmentPlan {
+  id          String    @id @default(uuid())
+  conditionId String
+  condition   Condition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+  title       String
+  source      String?   // who prescribed it
+  rawContent  String    // pasted or extracted plan text
+  aiReview    Json?     // structured AI analysis
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  exercises Exercise[]
+}
+
+model Exercise {
+  id              String            @id @default(uuid())
+  treatmentPlanId String
+  treatmentPlan   TreatmentPlan     @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  sets            Int?
+  reps            Int?
+  durationSecs    Int?              // for timed exercises
+  frequency       ExerciseFrequency @default(DAILY)
+  priority        Int               @default(5) // 1-10
+  bodyRegion      BodyRegion
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  exerciseLogs ExerciseLog[]
+}
+
+model DailyRoutine {
+  id           String        @id @default(uuid())
+  date         DateTime      @db.Date
+  exercises    Json          // ordered list of exercise refs + status
+  generatedBy  RoutineSource @default(AI)
+  totalMinutes Int           @default(30)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  exerciseLogs ExerciseLog[]
+
+  @@unique([date])
+}
+
+model ExerciseLog {
+  id             String       @id @default(uuid())
+  dailyRoutineId String
+  dailyRoutine   DailyRoutine @relation(fields: [dailyRoutineId], references: [id], onDelete: Cascade)
+  exerciseId     String
+  exercise       Exercise     @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  completed      Boolean      @default(false)
+  painBefore     Int?         // 1-10
+  painAfter      Int?         // 1-10
+  notes          String?
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+}
