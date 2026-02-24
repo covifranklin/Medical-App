@@ -51,6 +51,7 @@ export interface AilmentWithPain {
   status: AilmentStatus;
   diagnosis: string | null;
   notes: string | null;
+  treatmentPlanCount: number;
   latestPainLog: {
     painLevel: number;
     date: string;

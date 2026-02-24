@@ -16,6 +16,9 @@ export async function GET() {
           orderBy: { date: "desc" },
           take: 1,
         },
+        _count: {
+          select: { treatmentPlans: true },
+        },
       },
       orderBy: { severityLevel: "desc" },
     });
@@ -42,6 +45,7 @@ export async function GET() {
         status: ailment.status,
         diagnosis: ailment.diagnosis,
         notes: ailment.notes,
+        treatmentPlanCount: ailment._count.treatmentPlans,
         latestPainLog: latestLog
           ? {
               painLevel: latestLog.painLevel,
