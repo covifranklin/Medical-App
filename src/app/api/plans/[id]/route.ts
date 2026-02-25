@@ -35,7 +35,7 @@ export async function GET(
           },
         },
         exercises: {
-          orderBy: { createdAt: "asc" },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         },
       },
     });
@@ -72,6 +72,10 @@ export async function GET(
         durationMinutes: ex.durationMinutes,
         sets: ex.sets,
         reps: ex.reps,
+        holdSeconds: ex.holdSeconds,
+        frequencyPerWeek: ex.frequencyPerWeek,
+        videoUrl: ex.videoUrl,
+        sortOrder: ex.sortOrder,
         createdAt: ex.createdAt.toISOString(),
         updatedAt: ex.updatedAt.toISOString(),
       })),

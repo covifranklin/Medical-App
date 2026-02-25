@@ -118,6 +118,10 @@ model Exercise {
   durationMinutes   Int        @default(5)
   sets              Int?
   reps              Int?
+  holdSeconds       Int?       // for isometric holds
+  frequencyPerWeek  Int?       // how many times per week
+  videoUrl          String?    // optional link to demo video
+  sortOrder         Int        @default(0)  // ordering within a plan
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 
