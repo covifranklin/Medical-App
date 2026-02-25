@@ -99,12 +99,22 @@ model TreatmentPlan {
   frequency    ExerciseFrequency @default(DAILY)
   startDate    DateTime          @default(now())
   rawContent   String?           // pasted or extracted plan text
-  aiReview     Json?             // structured AI analysis
+  aiReview     Json?             // structured AI analysis (legacy)
   reviewedAt   DateTime?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
   exercises Exercise[]
+  reviews   PlanReview[]
+}
+
+model PlanReview {
+  id              String        @id @default(uuid())
+  treatmentPlanId String
+  treatmentPlan   TreatmentPlan @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  result          Json          // structured AI review result
+  modelUsed       String        // e.g. "claude-sonnet-4-5-20241022"
+  createdAt       DateTime      @default(now())
 }
 
 model Exercise {

@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PlanForm from "@/components/plans/PlanForm";
 import ExerciseForm from "@/components/plans/ExerciseForm";
+import AIReviewDisplay from "@/components/plans/AIReviewDisplay";
 import type { PlanFormData } from "@/components/plans/PlanForm";
+import type { PlanReviewResult } from "@/types";
 import type { ExerciseFrequency, BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 interface ExerciseEntry {
@@ -31,6 +33,13 @@ interface AilmentSummary {
   status: AilmentStatus;
 }
 
+interface LatestReview {
+  id: string;
+  result: PlanReviewResult;
+  modelUsed: string;
+  createdAt: string;
+}
+
 interface PlanDetail {
   id: string;
   ailmentId: string;
@@ -45,6 +54,7 @@ interface PlanDetail {
   updatedAt: string;
   ailment: AilmentSummary;
   exercises: ExerciseEntry[];
+  latestReview: LatestReview | null;
 }
 
 const SEVERITY_BADGE: Record<string, string> = {
@@ -90,6 +100,10 @@ export default function PlanDetailPage({
   const [editingExerciseId, setEditingExerciseId] = useState<string | null>(null);
   const [deletingExerciseId, setDeletingExerciseId] = useState<string | null>(null);
   const [reordering, setReordering] = useState(false);
+
+  // AI Review state
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
   const fetchPlan = useCallback(async () => {
     try {
@@ -189,6 +203,28 @@ export default function PlanDetailPage({
     }
   }
 
+  async function handleRequestReview() {
+    setReviewing(true);
+    setReviewError(null);
+    try {
+      const res = await fetch(`/api/plans/${params.id}/review`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setReviewError(data.error ?? "Failed to generate review.");
+        setReviewing(false);
+        return;
+      }
+      // Refresh plan to get the new latestReview
+      await fetchPlan();
+    } catch {
+      setReviewError("Network error. Please try again.");
+    } finally {
+      setReviewing(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="py-12 text-center text-sm text-gray-500">
@@ -263,12 +299,22 @@ export default function PlanDetailPage({
             {FREQUENCY_LABEL[plan.frequency] ?? plan.frequency} &middot; since {plan.startDate}
           </p>
         </div>
-        <Link
-          href={`/conditions/${plan.ailment.id}`}
-          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium shrink-0 ${SEVERITY_BADGE[plan.ailment.severityLevel]} hover:opacity-80`}
-        >
-          {plan.ailment.name}
-        </Link>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {plan.latestReview && (
+            <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-800 px-2.5 py-1 text-xs font-medium">
+              Reviewed {(() => {
+                const days = Math.floor((Date.now() - new Date(plan.latestReview.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+                return days === 0 ? "today" : days === 1 ? "yesterday" : `${days}d ago`;
+              })()}
+            </span>
+          )}
+          <Link
+            href={`/conditions/${plan.ailment.id}`}
+            className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${SEVERITY_BADGE[plan.ailment.severityLevel]} hover:opacity-80`}
+          >
+            {plan.ailment.name}
+          </Link>
+        </div>
       </div>
 
       {/* Actions */}
@@ -530,6 +576,53 @@ export default function PlanDetailPage({
               </li>
             ))}
           </ul>
+        )}
+      </div>
+
+      {/* AI Review section */}
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-900">AI Review</h2>
+          <button
+            onClick={handleRequestReview}
+            disabled={reviewing}
+            className="inline-flex items-center rounded-md bg-purple-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {reviewing ? (
+              <>
+                <svg className="animate-spin -ml-0.5 mr-1.5 h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Reviewing...
+              </>
+            ) : plan.latestReview ? (
+              "Re-run Review"
+            ) : (
+              "Get AI Review"
+            )}
+          </button>
+        </div>
+
+        {reviewError && (
+          <div className="mb-3 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+            {reviewError}
+          </div>
+        )}
+
+        {plan.latestReview ? (
+          <AIReviewDisplay
+            result={plan.latestReview.result}
+            createdAt={plan.latestReview.createdAt}
+            exerciseNames={Object.fromEntries(
+              plan.exercises.map((ex) => [ex.id, ex.name])
+            )}
+          />
+        ) : (
+          <p className="text-sm text-gray-500">
+            No AI review yet. Click &ldquo;Get AI Review&rdquo; to analyse this plan against evidence-based practices
+            and check for cross-condition interactions.
+          </p>
         )}
       </div>
 
