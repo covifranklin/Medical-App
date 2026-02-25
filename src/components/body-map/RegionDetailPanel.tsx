@@ -85,6 +85,14 @@ export default function RegionDetailPanel({
                     <p className="mt-1 text-xs text-gray-500">{ailment.notes}</p>
                   )}
 
+                  {ailment.treatmentPlanCount > 0 && (
+                    <div className="mt-1.5">
+                      <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-800 px-2 py-0.5 text-xs font-medium">
+                        {ailment.treatmentPlanCount} plan{ailment.treatmentPlanCount !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                  )}
+
                   {ailment.latestPainLog ? (
                     <div className="mt-2 flex items-center gap-2">
                       <div className="flex items-center gap-1.5">

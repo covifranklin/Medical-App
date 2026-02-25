@@ -1,13 +1,49 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
-// GET /api/exercises — list exercises (optionally filtered by plan)
-export async function GET() {
-  // TODO: Phase 2 — fetch exercises from database
-  return NextResponse.json({ exercises: [] });
+function isValidUUID(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// POST /api/exercises — create a new exercise
-export async function POST() {
-  // TODO: Phase 2 — create exercise in database
-  return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+// GET /api/exercises — list exercises, optionally filtered by planId
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const planId = searchParams.get("planId");
+
+    const where = planId && isValidUUID(planId)
+      ? { treatmentPlanId: planId }
+      : {};
+
+    const exercises = await prisma.exercise.findMany({
+      where,
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+
+    return NextResponse.json(
+      exercises.map((ex) => ({
+        id: ex.id,
+        treatmentPlanId: ex.treatmentPlanId,
+        name: ex.name,
+        description: ex.description,
+        targetBodyRegion: ex.targetBodyRegion,
+        contraindications: ex.contraindications,
+        durationMinutes: ex.durationMinutes,
+        sets: ex.sets,
+        reps: ex.reps,
+        holdSeconds: ex.holdSeconds,
+        frequencyPerWeek: ex.frequencyPerWeek,
+        videoUrl: ex.videoUrl,
+        sortOrder: ex.sortOrder,
+        createdAt: ex.createdAt.toISOString(),
+        updatedAt: ex.updatedAt.toISOString(),
+      }))
+    );
+  } catch (error) {
+    console.error("Failed to fetch exercises:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch exercises" },
+      { status: 500 }
+    );
+  }
 }

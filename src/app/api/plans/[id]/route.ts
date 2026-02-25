@@ -35,7 +35,11 @@ export async function GET(
           },
         },
         exercises: {
-          orderBy: { createdAt: "asc" },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
+        reviews: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
         },
       },
     });
@@ -72,9 +76,21 @@ export async function GET(
         durationMinutes: ex.durationMinutes,
         sets: ex.sets,
         reps: ex.reps,
+        holdSeconds: ex.holdSeconds,
+        frequencyPerWeek: ex.frequencyPerWeek,
+        videoUrl: ex.videoUrl,
+        sortOrder: ex.sortOrder,
         createdAt: ex.createdAt.toISOString(),
         updatedAt: ex.updatedAt.toISOString(),
       })),
+      latestReview: plan.reviews[0]
+        ? {
+            id: plan.reviews[0].id,
+            result: plan.reviews[0].result,
+            modelUsed: plan.reviews[0].modelUsed,
+            createdAt: plan.reviews[0].createdAt.toISOString(),
+          }
+        : null,
     });
   } catch (error) {
     console.error("Failed to fetch treatment plan:", error);

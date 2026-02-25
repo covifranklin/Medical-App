@@ -7,6 +7,7 @@ export interface BodyMapRegion {
   ailmentCount: number;
 }
 
+/** Legacy review result (kept for backward compatibility) */
 export interface AIReviewResult {
   overallRating: "good" | "fair" | "needs_improvement";
   summary: string;
@@ -15,6 +16,35 @@ export interface AIReviewResult {
   suggestions: string[];
   missingElements: string[];
   safetyFlags: string[];
+}
+
+/** Per-exercise AI review */
+export interface ExerciseReview {
+  exerciseId: string;
+  rating: "good" | "caution" | "concern";
+  feedback: string;
+  suggestedAlternative: string | null;
+}
+
+/** Full structured AI plan review */
+export interface PlanReviewResult {
+  overallAssessment: string;
+  exerciseReviews: ExerciseReview[];
+  crossConditionWarnings: string[];
+  confidenceLevel: "low" | "medium" | "high";
+  overallRating: "good" | "fair" | "needs_improvement";
+  strengths: string[];
+  concerns: string[];
+  suggestions: string[];
+}
+
+/** Saved plan review record */
+export interface PlanReviewRecord {
+  id: string;
+  treatmentPlanId: string;
+  result: PlanReviewResult;
+  modelUsed: string;
+  createdAt: string;
 }
 
 export interface DailyPlanExerciseItem {
@@ -51,6 +81,7 @@ export interface AilmentWithPain {
   status: AilmentStatus;
   diagnosis: string | null;
   notes: string | null;
+  treatmentPlanCount: number;
   latestPainLog: {
     painLevel: number;
     date: string;
