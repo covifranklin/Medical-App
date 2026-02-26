@@ -10,7 +10,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log("Seeding database...");
 
-  // Upsert default user
+  // ── User 1: Default User ───────────────────────────────
   const user = await prisma.user.upsert({
     where: { email: "default@physiotracker.local" },
     update: {},
@@ -20,9 +20,21 @@ async function main() {
       password: "not-set",
     },
   });
-  console.log(`User: ${user.id} (${user.email})`);
+  console.log(`User 1: ${user.id} (${user.email})`);
 
-  // Create 3 ailments across different regions and severities
+  // ── User 2: Test User (for data isolation testing) ─────
+  const user2 = await prisma.user.upsert({
+    where: { email: "testuser@physiotracker.local" },
+    update: {},
+    create: {
+      email: "testuser@physiotracker.local",
+      name: "Test User",
+      password: "not-set",
+    },
+  });
+  console.log(`User 2: ${user2.id} (${user2.email})`);
+
+  // ── Ailments for User 1 ────────────────────────────────
   const ailments = [
     {
       name: "L4-L5 Disc Herniation",
@@ -52,7 +64,6 @@ async function main() {
 
   const createdAilments = [];
   for (const data of ailments) {
-    // Check if exists by name + user to avoid duplicates on re-seed
     const existing = await prisma.ailment.findFirst({
       where: { userId: user.id, name: data.name },
     });
@@ -69,17 +80,30 @@ async function main() {
     }
   }
 
-  // Generate 7 days of pain logs for each ailment
+  // ── Ailment for User 2 (data isolation testing) ────────
+  const user2Ailment = await prisma.ailment.findFirst({
+    where: { userId: user2.id, name: "Left Shoulder Impingement" },
+  });
+  const user2AilmentData = user2Ailment ?? await prisma.ailment.create({
+    data: {
+      userId: user2.id,
+      name: "Left Shoulder Impingement",
+      bodyRegion: "LEFT_SHOULDER",
+      severityLevel: "MODERATE",
+      status: "ACTIVE",
+      diagnosis: "Subacromial impingement syndrome",
+      notes: "Pain with overhead movements. User 2's data — should NOT appear for User 1.",
+    },
+  });
+  console.log(`  User 2 ailment: ${user2AilmentData.name} (${user2AilmentData.id})`);
+
+  // ── Pain Logs for User 1 ───────────────────────────────
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Base pain levels and patterns per ailment (simulating realistic trends)
   const painPatterns: Record<number, number[]> = {
-    // L4-L5: severe, trending slightly down (improvement)
     0: [8, 7, 7, 6, 7, 6, 5],
-    // Right knee: moderate, stable
     1: [5, 4, 5, 5, 4, 5, 4],
-    // Headaches: mild, stable/low
     2: [3, 2, 3, 2, 2, 3, 2],
   };
 
@@ -90,7 +114,6 @@ async function main() {
     for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
       const date = new Date(today);
       date.setDate(date.getDate() - dayOffset);
-
       const painLevel = pattern[6 - dayOffset];
 
       await prisma.painLog.upsert({
@@ -115,6 +138,137 @@ async function main() {
       });
     }
     console.log(`  7-day pain logs for: ${ailment.name}`);
+  }
+
+  // ── Treatment Plan + Exercises for L4-L5 Disc Herniation ──
+  const backAilment = createdAilments[0];
+  let backPlan = await prisma.treatmentPlan.findFirst({
+    where: { ailmentId: backAilment.id, title: "Physio Plan from Dr. Smith" },
+  });
+
+  if (!backPlan) {
+    backPlan = await prisma.treatmentPlan.create({
+      data: {
+        ailmentId: backAilment.id,
+        title: "Physio Plan from Dr. Smith",
+        prescribedBy: "Dr. Smith, PT",
+        frequency: "DAILY",
+        rawContent: [
+          "Treatment plan for L4-L5 disc herniation recovery.",
+          "Focus on core stabilisation, nerve gliding, and gradual return to function.",
+          "Avoid loaded spinal flexion. No heavy lifting above 10kg for 6 weeks.",
+          "Re-assess in 4 weeks. Progress to standing exercises once pain < 4/10.",
+        ].join("\n"),
+      },
+    });
+    console.log(`  Created plan: ${backPlan.title}`);
+
+    const exercises = [
+      {
+        name: "Bird-Dog Hold",
+        description: "From hands and knees, extend opposite arm and leg. Hold. Maintain neutral spine.",
+        targetBodyRegion: "LOWER_BACK" as const,
+        sets: 3, reps: 10, holdSeconds: 10, durationMinutes: 5,
+        contraindications: "Stop if sharp radiating pain down the leg.",
+        sortOrder: 0,
+      },
+      {
+        name: "Sciatic Nerve Glide",
+        description: "Seated, extend knee while dorsiflexing ankle. Gently move through range. Do not force stretch.",
+        targetBodyRegion: "LOWER_BACK" as const,
+        sets: 2, reps: 15, holdSeconds: null, durationMinutes: 5,
+        contraindications: "Avoid if numbness worsens during the exercise.",
+        sortOrder: 1,
+      },
+      {
+        name: "Dead Bug",
+        description: "Lying supine, alternate extending opposite arm and leg while keeping lower back pressed into floor.",
+        targetBodyRegion: "LOWER_BACK" as const,
+        sets: 3, reps: 12, holdSeconds: null, durationMinutes: 5,
+        contraindications: "If lower back lifts off floor, reduce range of motion.",
+        sortOrder: 2,
+      },
+      {
+        name: "Cat-Cow Stretch",
+        description: "Hands and knees. Alternate arching and rounding the spine through comfortable range.",
+        targetBodyRegion: "LOWER_BACK" as const,
+        sets: 2, reps: 10, holdSeconds: null, durationMinutes: 3,
+        contraindications: null,
+        sortOrder: 3,
+      },
+      {
+        name: "Glute Bridge",
+        description: "Lying supine with knees bent. Lift hips towards ceiling, squeezing glutes at top.",
+        targetBodyRegion: "LOWER_BACK" as const,
+        sets: 3, reps: 12, holdSeconds: 5, durationMinutes: 5,
+        contraindications: "Avoid if causes pain in the sacroiliac joint.",
+        sortOrder: 4,
+      },
+    ];
+
+    for (const ex of exercises) {
+      await prisma.exercise.create({
+        data: { ...ex, treatmentPlanId: backPlan.id },
+      });
+    }
+    console.log(`  Created ${exercises.length} exercises for: ${backPlan.title}`);
+  }
+
+  // ── Treatment Plan + Exercises for Right Knee ─────────────
+  const kneeAilment = createdAilments[1];
+  let kneePlan = await prisma.treatmentPlan.findFirst({
+    where: { ailmentId: kneeAilment.id, title: "Knee Rehab — Running Return" },
+  });
+
+  if (!kneePlan) {
+    kneePlan = await prisma.treatmentPlan.create({
+      data: {
+        ailmentId: kneeAilment.id,
+        title: "Knee Rehab — Running Return",
+        prescribedBy: "Dr. Patel, Sports Medicine",
+        frequency: "ALTERNATE_DAYS",
+        rawContent: [
+          "Patellofemoral rehab program. VMO strengthening and hip stability.",
+          "Avoid deep squats (>90 deg). No running until pain-free on stairs.",
+          "Ice after exercises for 10 minutes.",
+        ].join("\n"),
+      },
+    });
+    console.log(`  Created plan: ${kneePlan.title}`);
+
+    const kneeExercises = [
+      {
+        name: "Terminal Knee Extension",
+        description: "With resistance band, extend knee from 30 degrees to full extension. Focus on VMO activation.",
+        targetBodyRegion: "RIGHT_KNEE" as const,
+        sets: 3, reps: 15, holdSeconds: 3, durationMinutes: 5,
+        contraindications: "Stop if patella tracking feels off or causes clicking.",
+        sortOrder: 0,
+      },
+      {
+        name: "Single-Leg Calf Raise",
+        description: "Stand on right leg, slowly raise onto toes and lower. Hold wall for balance.",
+        targetBodyRegion: "RIGHT_KNEE" as const,
+        sets: 3, reps: 15, holdSeconds: null, durationMinutes: 4,
+        contraindications: null,
+        sortOrder: 1,
+      },
+      {
+        name: "Clamshell",
+        description: "Side-lying with band around knees. Open knees apart keeping feet together. Slow and controlled.",
+        targetBodyRegion: "RIGHT_HIP" as const,
+        sets: 3, reps: 15, holdSeconds: null, durationMinutes: 4,
+        contraindications: null,
+        sortOrder: 2,
+      },
+    ];
+
+    for (const ex of kneeExercises) {
+      await prisma.exercise.create({
+        data: { ...ex, treatmentPlanId: kneePlan.id },
+      });
+    }
+    console.log(`  Created ${kneeExercises.length} exercises for: ${kneePlan.title}`);
   }
 
   console.log("Seed complete.");

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser, verifyAilmentOwnership } from "@/lib/user";
 import type { ExerciseFrequency } from "@prisma/client";
 
 const EXERCISE_FREQUENCIES: ExerciseFrequency[] = [
   "DAILY", "ALTERNATE_DAYS", "WEEKLY", "AS_NEEDED",
 ];
 
-// UUID v4 format check
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/ailments/:id/plans — list all treatment plans for an ailment
+// GET /api/ailments/:id/plans — list all treatment plans for an ailment (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -22,7 +22,8 @@ export async function GET(
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const ailment = await prisma.ailment.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+    const ailment = await verifyAilmentOwnership(id, user.id);
     if (!ailment) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }
@@ -62,7 +63,7 @@ export async function GET(
   }
 }
 
-// POST /api/ailments/:id/plans — create a treatment plan for an ailment
+// POST /api/ailments/:id/plans — create a treatment plan for an ailment (must belong to current user)
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -73,7 +74,8 @@ export async function POST(
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const ailment = await prisma.ailment.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+    const ailment = await verifyAilmentOwnership(id, user.id);
     if (!ailment) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }
@@ -81,14 +83,12 @@ export async function POST(
     const body = await request.json();
     const errors: string[] = [];
 
-    // title — required
     if (!body.title || typeof body.title !== "string" || body.title.trim().length === 0) {
       errors.push("Title is required.");
     } else if (body.title.trim().length > 300) {
       errors.push("Title must be 300 characters or fewer.");
     }
 
-    // prescribedBy — optional
     if (body.prescribedBy !== undefined && body.prescribedBy !== null) {
       if (typeof body.prescribedBy !== "string") {
         errors.push("prescribedBy must be a string.");
@@ -97,12 +97,10 @@ export async function POST(
       }
     }
 
-    // frequency — optional, defaults to DAILY
     if (body.frequency !== undefined && !EXERCISE_FREQUENCIES.includes(body.frequency)) {
       errors.push(`frequency must be one of: ${EXERCISE_FREQUENCIES.join(", ")}`);
     }
 
-    // startDate — optional, defaults to now
     if (body.startDate !== undefined && body.startDate !== null) {
       const d = new Date(body.startDate);
       if (isNaN(d.getTime())) {
@@ -110,7 +108,6 @@ export async function POST(
       }
     }
 
-    // rawContent — optional
     if (body.rawContent !== undefined && body.rawContent !== null) {
       if (typeof body.rawContent !== "string") {
         errors.push("rawContent must be a string.");

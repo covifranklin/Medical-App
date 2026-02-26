@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 
 // GET /api/pain-logs/summary
-// Returns: { loggedToday, ailments: [{ id, name, bodyRegion, severityLevel, status, latestPainLevel, trend }] }
 export async function GET() {
   try {
+    const user = await getCurrentUser();
+
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // 7 days ago (for trend calculation)
     const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    // Get all non-resolved ailments
+    // Get current user's non-resolved ailments only
     const ailments = await prisma.ailment.findMany({
-      where: { status: { not: "RESOLVED" } },
+      where: { userId: user.id, status: { not: "RESOLVED" } },
       include: {
         painLogs: {
           where: { date: { gte: weekAgo } },
@@ -36,7 +37,6 @@ export async function GET() {
 
       const latestPainLevel = logs.length > 0 ? logs[0].painLevel : null;
 
-      // Trend: compare average of last 3 days vs previous 4 days
       let trend: "up" | "down" | "stable" | null = null;
       if (logs.length >= 2) {
         const threeDaysAgo = new Date(today);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
 import { PLAN_REVIEW_SYSTEM, buildPlanReviewPrompt } from "@/lib/prompts/plan-review";
 import type { Prisma } from "@prisma/client";
@@ -22,7 +23,7 @@ const REGION_LABELS: Record<string, string> = {
 
 const MODEL_ID = "claude-sonnet-4-5-20241022";
 
-// GET /api/plans/:id/review — get cached reviews for a plan
+// GET /api/plans/:id/review — get cached reviews for a plan (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -31,6 +32,17 @@ export async function GET(
     const { id } = params;
     if (!isValidUUID(id)) {
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
+    }
+
+    const user = await getCurrentUser();
+
+    // Verify plan belongs to current user
+    const plan = await prisma.treatmentPlan.findFirst({
+      where: { id, ailment: { userId: user.id } },
+      select: { id: true },
+    });
+    if (!plan) {
+      return NextResponse.json({ error: "Treatment plan not found" }, { status: 404 });
     }
 
     const reviews = await prisma.planReview.findMany({
@@ -57,7 +69,7 @@ export async function GET(
   }
 }
 
-// POST /api/plans/:id/review — trigger AI review of a treatment plan
+// POST /api/plans/:id/review — trigger AI review of a treatment plan (must belong to current user)
 export async function POST(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -68,9 +80,11 @@ export async function POST(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    // Fetch the plan with its ailment and exercises
-    const plan = await prisma.treatmentPlan.findUnique({
-      where: { id },
+    const user = await getCurrentUser();
+
+    // Fetch the plan with its ailment and exercises — verify user ownership
+    const plan = await prisma.treatmentPlan.findFirst({
+      where: { id, ailment: { userId: user.id } },
       include: {
         ailment: true,
         exercises: {
@@ -83,9 +97,10 @@ export async function POST(
       return NextResponse.json({ error: "Treatment plan not found" }, { status: 404 });
     }
 
-    // Fetch ALL other ailments for cross-condition analysis
+    // Fetch OTHER ailments for cross-condition analysis — scoped to same user
     const otherAilments = await prisma.ailment.findMany({
       where: {
+        userId: user.id,
         id: { not: plan.ailmentId },
         status: { not: "RESOLVED" },
       },

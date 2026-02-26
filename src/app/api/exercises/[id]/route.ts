@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser, verifyExerciseOwnership } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -14,7 +15,7 @@ function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/exercises/:id — fetch a single exercise
+// GET /api/exercises/:id — fetch a single exercise (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -25,9 +26,8 @@ export async function GET(
       return NextResponse.json({ error: "Invalid exercise ID" }, { status: 400 });
     }
 
-    const exercise = await prisma.exercise.findUnique({
-      where: { id },
-    });
+    const user = await getCurrentUser();
+    const exercise = await verifyExerciseOwnership(id, user.id);
 
     if (!exercise) {
       return NextResponse.json({ error: "Exercise not found" }, { status: 404 });
@@ -59,7 +59,7 @@ export async function GET(
   }
 }
 
-// PUT /api/exercises/:id — update an exercise (partial)
+// PUT /api/exercises/:id — update an exercise (must belong to current user)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -70,7 +70,9 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid exercise ID" }, { status: 400 });
     }
 
-    const existing = await prisma.exercise.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+    const existing = await verifyExerciseOwnership(id, user.id);
+
     if (!existing) {
       return NextResponse.json({ error: "Exercise not found" }, { status: 404 });
     }
@@ -160,7 +162,6 @@ export async function PUT(
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Build update data from provided fields only
     const data: Record<string, unknown> = {};
     if (body.name !== undefined) data.name = body.name.trim();
     if (body.description !== undefined) data.description = body.description?.trim() || null;
@@ -205,7 +206,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/exercises/:id — delete an exercise
+// DELETE /api/exercises/:id — delete an exercise (must belong to current user)
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -216,7 +217,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid exercise ID" }, { status: 400 });
     }
 
-    const existing = await prisma.exercise.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+    const existing = await verifyExerciseOwnership(id, user.id);
+
     if (!existing) {
       return NextResponse.json({ error: "Exercise not found" }, { status: 404 });
     }

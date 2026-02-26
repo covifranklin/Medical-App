@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/exercises — list exercises, optionally filtered by planId
+// GET /api/exercises — list exercises for the current user, optionally filtered by planId
 export async function GET(request: NextRequest) {
   try {
+    const user = await getCurrentUser();
     const { searchParams } = new URL(request.url);
     const planId = searchParams.get("planId");
 
-    const where = planId && isValidUUID(planId)
-      ? { treatmentPlanId: planId }
-      : {};
+    const where: Record<string, unknown> = {
+      treatmentPlan: { ailment: { userId: user.id } },
+    };
+
+    if (planId && isValidUUID(planId)) {
+      where.treatmentPlanId = planId;
+    }
 
     const exercises = await prisma.exercise.findMany({
       where,

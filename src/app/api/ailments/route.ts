@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -62,14 +63,15 @@ function validateAilmentInput(body: CreateAilmentBody) {
   return errors;
 }
 
-// GET /api/ailments — list all ailments with latest pain log
+// GET /api/ailments — list current user's ailments with latest pain log
 export async function GET(request: NextRequest) {
   try {
+    const user = await getCurrentUser();
     const { searchParams } = request.nextUrl;
     const status = searchParams.get("status");
     const bodyRegion = searchParams.get("bodyRegion");
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { userId: user.id };
     if (status && AILMENT_STATUSES.includes(status as AilmentStatus)) {
       where.status = status;
     }
@@ -121,7 +123,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/ailments — create a new ailment
+// POST /api/ailments — create a new ailment for current user
 export async function POST(request: NextRequest) {
   try {
     const body: CreateAilmentBody = await request.json();
@@ -131,16 +133,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Single-user mode: get or create the default user
-    const user = await prisma.user.upsert({
-      where: { email: "default@physiotracker.local" },
-      update: {},
-      create: {
-        email: "default@physiotracker.local",
-        name: "Default User",
-        password: "not-set",
-      },
-    });
+    const user = await getCurrentUser();
 
     const ailment = await prisma.ailment.create({
       data: {
