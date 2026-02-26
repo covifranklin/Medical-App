@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 import type { ExerciseFrequency } from "@prisma/client";
 
 const EXERCISE_FREQUENCIES: ExerciseFrequency[] = [
   "DAILY", "ALTERNATE_DAYS", "WEEKLY", "AS_NEEDED",
 ];
 
-// UUID v4 format check
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/plans/:id — fetch a single treatment plan with exercises
+// GET /api/plans/:id — fetch a single treatment plan (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -22,8 +22,10 @@ export async function GET(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    const plan = await prisma.treatmentPlan.findUnique({
-      where: { id },
+    const user = await getCurrentUser();
+
+    const plan = await prisma.treatmentPlan.findFirst({
+      where: { id, ailment: { userId: user.id } },
       include: {
         ailment: {
           select: {
@@ -101,7 +103,7 @@ export async function GET(
   }
 }
 
-// PUT /api/plans/:id — update a treatment plan
+// PUT /api/plans/:id — update a treatment plan (must belong to current user)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -112,7 +114,11 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    const existing = await prisma.treatmentPlan.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+
+    const existing = await prisma.treatmentPlan.findFirst({
+      where: { id, ailment: { userId: user.id } },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Treatment plan not found" }, { status: 404 });
     }
@@ -120,7 +126,6 @@ export async function PUT(
     const body = await request.json();
     const errors: string[] = [];
 
-    // Validate only provided fields
     if (body.title !== undefined) {
       if (typeof body.title !== "string" || body.title.trim().length === 0) {
         errors.push("Title cannot be empty.");
@@ -160,7 +165,6 @@ export async function PUT(
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Build update data from provided fields only
     const data: Record<string, unknown> = {};
     if (body.title !== undefined) data.title = body.title.trim();
     if (body.prescribedBy !== undefined) data.prescribedBy = body.prescribedBy?.trim() || null;
@@ -197,7 +201,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/plans/:id — delete a treatment plan (cascades to exercises)
+// DELETE /api/plans/:id — delete a treatment plan (must belong to current user)
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -208,7 +212,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    const existing = await prisma.treatmentPlan.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+
+    const existing = await prisma.treatmentPlan.findFirst({
+      where: { id, ailment: { userId: user.id } },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Treatment plan not found" }, { status: 404 });
     }

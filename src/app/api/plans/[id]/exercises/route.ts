@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -48,7 +49,7 @@ function serializeExercise(ex: {
   };
 }
 
-// GET /api/plans/:planId/exercises — list exercises for a plan
+// GET /api/plans/:id/exercises — list exercises for a plan (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -59,8 +60,10 @@ export async function GET(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    const plan = await prisma.treatmentPlan.findUnique({
-      where: { id: planId },
+    const user = await getCurrentUser();
+
+    const plan = await prisma.treatmentPlan.findFirst({
+      where: { id: planId, ailment: { userId: user.id } },
       select: { id: true },
     });
     if (!plan) {
@@ -82,7 +85,7 @@ export async function GET(
   }
 }
 
-// POST /api/plans/:planId/exercises — create an exercise within a plan
+// POST /api/plans/:id/exercises — create an exercise within a plan (must belong to current user)
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -93,8 +96,10 @@ export async function POST(
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
     }
 
-    const plan = await prisma.treatmentPlan.findUnique({
-      where: { id: planId },
+    const user = await getCurrentUser();
+
+    const plan = await prisma.treatmentPlan.findFirst({
+      where: { id: planId, ailment: { userId: user.id } },
       select: { id: true },
     });
     if (!plan) {
@@ -104,19 +109,16 @@ export async function POST(
     const body = await request.json();
     const errors: string[] = [];
 
-    // name — required
     if (!body.name || typeof body.name !== "string" || body.name.trim().length === 0) {
       errors.push("Name is required.");
     } else if (body.name.trim().length > 300) {
       errors.push("Name must be 300 characters or fewer.");
     }
 
-    // targetBodyRegion — required
     if (!body.targetBodyRegion || !BODY_REGIONS.includes(body.targetBodyRegion)) {
       errors.push(`targetBodyRegion must be one of: ${BODY_REGIONS.join(", ")}`);
     }
 
-    // description — optional string
     if (body.description !== undefined && body.description !== null) {
       if (typeof body.description !== "string") {
         errors.push("description must be a string.");
@@ -125,7 +127,6 @@ export async function POST(
       }
     }
 
-    // contraindications — optional string
     if (body.contraindications !== undefined && body.contraindications !== null) {
       if (typeof body.contraindications !== "string") {
         errors.push("contraindications must be a string.");
@@ -134,7 +135,6 @@ export async function POST(
       }
     }
 
-    // durationMinutes — optional int, default 5
     if (body.durationMinutes !== undefined && body.durationMinutes !== null) {
       const dur = Number(body.durationMinutes);
       if (!Number.isInteger(dur) || dur < 0 || dur > 600) {
@@ -142,7 +142,6 @@ export async function POST(
       }
     }
 
-    // sets — optional int
     if (body.sets !== undefined && body.sets !== null) {
       const s = Number(body.sets);
       if (!Number.isInteger(s) || s < 0 || s > 100) {
@@ -150,7 +149,6 @@ export async function POST(
       }
     }
 
-    // reps — optional int
     if (body.reps !== undefined && body.reps !== null) {
       const r = Number(body.reps);
       if (!Number.isInteger(r) || r < 0 || r > 1000) {
@@ -158,7 +156,6 @@ export async function POST(
       }
     }
 
-    // holdSeconds — optional int
     if (body.holdSeconds !== undefined && body.holdSeconds !== null) {
       const h = Number(body.holdSeconds);
       if (!Number.isInteger(h) || h < 0 || h > 3600) {
@@ -166,7 +163,6 @@ export async function POST(
       }
     }
 
-    // frequencyPerWeek — optional int
     if (body.frequencyPerWeek !== undefined && body.frequencyPerWeek !== null) {
       const f = Number(body.frequencyPerWeek);
       if (!Number.isInteger(f) || f < 0 || f > 21) {
@@ -174,7 +170,6 @@ export async function POST(
       }
     }
 
-    // videoUrl — optional string
     if (body.videoUrl !== undefined && body.videoUrl !== null) {
       if (typeof body.videoUrl !== "string") {
         errors.push("videoUrl must be a string.");
@@ -187,7 +182,6 @@ export async function POST(
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Determine next sortOrder
     const maxSort = await prisma.exercise.aggregate({
       where: { treatmentPlanId: planId },
       _max: { sortOrder: true },

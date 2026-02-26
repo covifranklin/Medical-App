@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -13,12 +14,11 @@ const BODY_REGIONS: BodyRegion[] = [
 const SEVERITY_LEVELS: SeverityLevel[] = ["MILD", "MODERATE", "SEVERE", "CRITICAL"];
 const AILMENT_STATUSES: AilmentStatus[] = ["ACTIVE", "MANAGED", "RESOLVED"];
 
-// UUID v4 format check
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }
 
-// GET /api/ailments/:id — fetch a single ailment with pain logs and treatment plans
+// GET /api/ailments/:id — fetch a single ailment (must belong to current user)
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -29,8 +29,10 @@ export async function GET(
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const ailment = await prisma.ailment.findUnique({
-      where: { id },
+    const user = await getCurrentUser();
+
+    const ailment = await prisma.ailment.findFirst({
+      where: { id, userId: user.id },
       include: {
         painLogs: {
           orderBy: { date: "desc" },
@@ -89,7 +91,7 @@ export async function GET(
   }
 }
 
-// PUT /api/ailments/:id — update an ailment
+// PUT /api/ailments/:id — update an ailment (must belong to current user)
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -100,7 +102,11 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const existing = await prisma.ailment.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+
+    const existing = await prisma.ailment.findFirst({
+      where: { id, userId: user.id },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }
@@ -108,7 +114,6 @@ export async function PUT(
     const body = await request.json();
     const errors: string[] = [];
 
-    // Validate only provided fields
     if (body.name !== undefined) {
       if (typeof body.name !== "string" || body.name.trim().length === 0) {
         errors.push("Name cannot be empty.");
@@ -152,7 +157,6 @@ export async function PUT(
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Build update data from provided fields only
     const data: Record<string, unknown> = {};
     if (body.name !== undefined) data.name = body.name.trim();
     if (body.bodyRegion !== undefined) data.bodyRegion = body.bodyRegion;
@@ -179,7 +183,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/ailments/:id — delete an ailment (cascades to pain logs & treatment plans)
+// DELETE /api/ailments/:id — delete an ailment (must belong to current user)
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
@@ -190,7 +194,11 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid ailment ID" }, { status: 400 });
     }
 
-    const existing = await prisma.ailment.findUnique({ where: { id } });
+    const user = await getCurrentUser();
+
+    const existing = await prisma.ailment.findFirst({
+      where: { id, userId: user.id },
+    });
     if (!existing) {
       return NextResponse.json({ error: "Ailment not found" }, { status: 404 });
     }

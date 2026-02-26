@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/user";
 
 // GET /api/pain-logs?date=2026-02-23&ailmentId=xxx
 export async function GET(request: NextRequest) {
   try {
+    const user = await getCurrentUser();
     const { searchParams } = request.nextUrl;
     const date = searchParams.get("date");
     const ailmentId = searchParams.get("ailmentId");
 
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = { userId: user.id };
 
     if (date) {
       const d = new Date(date);
@@ -61,7 +63,6 @@ interface PainLogEntry {
 }
 
 // POST /api/pain-logs — batch upsert pain logs for a day
-// Body: { entries: PainLogEntry[] }
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -74,7 +75,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate all entries upfront
     const errors: string[] = [];
     for (let i = 0; i < entries.length; i++) {
       const e = entries[i];
@@ -104,21 +104,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ errors }, { status: 400 });
     }
 
-    // Single-user mode: get or create the default user
-    const user = await prisma.user.upsert({
-      where: { email: "default@physiotracker.local" },
-      update: {},
-      create: {
-        email: "default@physiotracker.local",
-        name: "Default User",
-        password: "not-set",
-      },
-    });
+    const user = await getCurrentUser();
 
-    // Verify all ailment IDs exist
+    // Verify all ailment IDs belong to the current user
     const ailmentIds = Array.from(new Set(entries.map((e) => e.ailmentId)));
     const existingAilments = await prisma.ailment.findMany({
-      where: { id: { in: ailmentIds } },
+      where: { id: { in: ailmentIds }, userId: user.id },
       select: { id: true },
     });
     const existingIds = new Set(existingAilments.map((a) => a.id));
@@ -130,11 +121,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upsert each entry (unique constraint: userId + ailmentId + date)
     const results = await Promise.all(
       entries.map((e) => {
         const logDate = e.date ? new Date(e.date) : new Date();
-        // Normalize to date-only (strip time)
         const dateOnly = new Date(
           logDate.getFullYear(),
           logDate.getMonth(),
