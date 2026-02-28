@@ -50,17 +50,27 @@ export interface PlanReviewRecord {
 export interface DailyPlanExerciseItem {
   exerciseId: string;
   order: number;
+  sets: number | null;
+  reps: number | null;
+  holdSeconds: number | null;
   estimatedMinutes: number;
   reason: string;
+  targetAilment: string;
+}
+
+export interface SkippedExercise {
+  exerciseId: string;
+  exerciseName: string;
+  reason: string;
+  suggestedReturn: string;
 }
 
 export interface GeneratedDailyPlan {
+  warmUp: string;
   exercises: DailyPlanExerciseItem[];
+  coolDown: string;
   totalMinutes: number;
-  skippedExercises: Array<{
-    exerciseId: string;
-    reason: string;
-  }>;
+  skippedExercises: SkippedExercise[];
   notes: string;
 }
 
