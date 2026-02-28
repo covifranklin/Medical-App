@@ -34,6 +34,18 @@ async function main() {
   });
   console.log(`User 2: ${user2.id} (${user2.email})`);
 
+  // ── User Preferences ────────────────────────────────────
+  await prisma.userPreferences.upsert({
+    where: { userId: user.id },
+    update: {},
+    create: {
+      userId: user.id,
+      dailyTimeBudgetMinutes: 30,
+      weeklyFocusAreas: ["LOWER_BACK", "RIGHT_KNEE"],
+    },
+  });
+  console.log("  Default user preferences set (30min, focus: lower back + right knee)");
+
   // ── Ailments for User 1 ────────────────────────────────
   const ailments = [
     {
@@ -41,6 +53,8 @@ async function main() {
       bodyRegion: "LOWER_BACK" as const,
       severityLevel: "SEVERE" as const,
       status: "ACTIVE" as const,
+      priorityLevel: "HIGH" as const,
+      goalTimeframe: "ACUTE_RELIEF" as const,
       diagnosis: "Posterior disc herniation at L4-L5 with nerve root impingement",
       notes: "Aggravated by prolonged sitting. MRI confirmed Feb 2026.",
     },
@@ -49,6 +63,8 @@ async function main() {
       bodyRegion: "RIGHT_KNEE" as const,
       severityLevel: "MODERATE" as const,
       status: "ACTIVE" as const,
+      priorityLevel: "MEDIUM" as const,
+      goalTimeframe: "THIS_MONTH" as const,
       diagnosis: "Patellofemoral pain syndrome with mild chondromalacia",
       notes: "Worse going downstairs. Started after increasing running volume.",
     },
@@ -57,6 +73,8 @@ async function main() {
       bodyRegion: "HEAD" as const,
       severityLevel: "MILD" as const,
       status: "MANAGED" as const,
+      priorityLevel: "LOW" as const,
+      goalTimeframe: "MAINTENANCE" as const,
       diagnosis: "Chronic tension-type headache",
       notes: "Typically 2-3x per week, worse in afternoon. Related to neck posture.",
     },

@@ -10,6 +10,7 @@ const navItems = [
   { href: "/plans", label: "Plans" },
   { href: "/daily", label: "Daily Routine" },
   { href: "/history", label: "History" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export default function Nav() {

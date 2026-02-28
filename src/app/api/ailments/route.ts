@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/user";
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
   "HEAD", "NECK", "LEFT_SHOULDER", "RIGHT_SHOULDER", "UPPER_BACK",
@@ -13,12 +13,16 @@ const BODY_REGIONS: BodyRegion[] = [
 
 const SEVERITY_LEVELS: SeverityLevel[] = ["MILD", "MODERATE", "SEVERE", "CRITICAL"];
 const AILMENT_STATUSES: AilmentStatus[] = ["ACTIVE", "MANAGED", "RESOLVED"];
+const PRIORITY_LEVELS: PriorityLevel[] = ["HIGH", "MEDIUM", "LOW"];
+const GOAL_TIMEFRAMES: GoalTimeframe[] = ["ACUTE_RELIEF", "THIS_WEEK", "THIS_MONTH", "MAINTENANCE"];
 
 interface CreateAilmentBody {
   name?: string;
   bodyRegion?: string;
   severityLevel?: string;
   status?: string;
+  priorityLevel?: string;
+  goalTimeframe?: string;
   diagnosis?: string;
   dateDiagnosed?: string;
   notes?: string;
@@ -43,6 +47,14 @@ function validateAilmentInput(body: CreateAilmentBody) {
 
   if (body.status && !AILMENT_STATUSES.includes(body.status as AilmentStatus)) {
     errors.push(`status must be one of: ${AILMENT_STATUSES.join(", ")}`);
+  }
+
+  if (body.priorityLevel && !PRIORITY_LEVELS.includes(body.priorityLevel as PriorityLevel)) {
+    errors.push(`priorityLevel must be one of: ${PRIORITY_LEVELS.join(", ")}`);
+  }
+
+  if (body.goalTimeframe && !GOAL_TIMEFRAMES.includes(body.goalTimeframe as GoalTimeframe)) {
+    errors.push(`goalTimeframe must be one of: ${GOAL_TIMEFRAMES.join(", ")}`);
   }
 
   if (body.diagnosis && typeof body.diagnosis === "string" && body.diagnosis.length > 1000) {
@@ -102,6 +114,8 @@ export async function GET(request: NextRequest) {
       diagnosis: a.diagnosis,
       dateDiagnosed: a.dateDiagnosed?.toISOString().split("T")[0] ?? null,
       notes: a.notes,
+      priorityLevel: a.priorityLevel,
+      goalTimeframe: a.goalTimeframe,
       treatmentPlanCount: a._count.treatmentPlans,
       latestPainLog: a.painLogs[0]
         ? {
@@ -142,6 +156,8 @@ export async function POST(request: NextRequest) {
         bodyRegion: body.bodyRegion as BodyRegion,
         severityLevel: (body.severityLevel as SeverityLevel) ?? "MODERATE",
         status: (body.status as AilmentStatus) ?? "ACTIVE",
+        priorityLevel: (body.priorityLevel as PriorityLevel) ?? "MEDIUM",
+        goalTimeframe: (body.goalTimeframe as GoalTimeframe) ?? "THIS_MONTH",
         diagnosis: body.diagnosis?.trim() || null,
         dateDiagnosed: body.dateDiagnosed ? new Date(body.dateDiagnosed) : null,
         notes: body.notes?.trim() || null,

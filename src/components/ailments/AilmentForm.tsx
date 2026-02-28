@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 const BODY_REGION_OPTIONS: { value: BodyRegion; label: string }[] = [
   { value: "HEAD", label: "Head" },
@@ -41,11 +41,26 @@ const STATUS_OPTIONS: { value: AilmentStatus; label: string }[] = [
   { value: "RESOLVED", label: "Resolved" },
 ];
 
+const PRIORITY_OPTIONS: { value: PriorityLevel; label: string; description: string }[] = [
+  { value: "HIGH", label: "High", description: "Prioritise in daily plan" },
+  { value: "MEDIUM", label: "Medium", description: "Normal weighting" },
+  { value: "LOW", label: "Low", description: "Include when time allows" },
+];
+
+const GOAL_OPTIONS: { value: GoalTimeframe; label: string; description: string }[] = [
+  { value: "ACUTE_RELIEF", label: "Acute Relief", description: "Immediate pain management" },
+  { value: "THIS_WEEK", label: "This Week", description: "Short-term goals" },
+  { value: "THIS_MONTH", label: "This Month", description: "Medium-term rehab" },
+  { value: "MAINTENANCE", label: "Maintenance", description: "Ongoing management" },
+];
+
 export interface AilmentFormData {
   name: string;
   bodyRegion: BodyRegion;
   severityLevel: SeverityLevel;
   status: AilmentStatus;
+  priorityLevel: PriorityLevel;
+  goalTimeframe: GoalTimeframe;
   diagnosis: string;
   dateDiagnosed: string;
   notes: string;
@@ -76,6 +91,8 @@ export default function AilmentForm({
     bodyRegion: initialData?.bodyRegion ?? "LOWER_BACK",
     severityLevel: initialData?.severityLevel ?? "MODERATE",
     status: initialData?.status ?? "ACTIVE",
+    priorityLevel: initialData?.priorityLevel ?? "MEDIUM",
+    goalTimeframe: initialData?.goalTimeframe ?? "THIS_MONTH",
     diagnosis: initialData?.diagnosis ?? "",
     dateDiagnosed: initialData?.dateDiagnosed ?? "",
     notes: initialData?.notes ?? "",
@@ -108,6 +125,8 @@ export default function AilmentForm({
       bodyRegion: form.bodyRegion,
       severityLevel: form.severityLevel,
       status: form.status,
+      priorityLevel: form.priorityLevel,
+      goalTimeframe: form.goalTimeframe,
       diagnosis: form.diagnosis.trim() || null,
       dateDiagnosed: form.dateDiagnosed || null,
       notes: form.notes.trim() || null,
@@ -227,6 +246,45 @@ export default function AilmentForm({
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Priority + Goal row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="priorityLevel" className="block text-sm font-medium text-gray-700">
+            Daily Plan Priority
+          </label>
+          <select
+            id="priorityLevel"
+            value={form.priorityLevel}
+            onChange={(e) => updateField("priorityLevel", e.target.value as PriorityLevel)}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            {PRIORITY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label} — {opt.description}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="goalTimeframe" className="block text-sm font-medium text-gray-700">
+            Goal Timeframe
+          </label>
+          <select
+            id="goalTimeframe"
+            value={form.goalTimeframe}
+            onChange={(e) => updateField("goalTimeframe", e.target.value as GoalTimeframe)}
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            {GOAL_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label} — {opt.description}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Diagnosis + Date row */}

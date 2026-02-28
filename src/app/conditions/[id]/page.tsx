@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AilmentForm from "@/components/ailments/AilmentForm";
 import type { AilmentFormData } from "@/components/ailments/AilmentForm";
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 interface PainLogEntry {
   id: string;
@@ -29,6 +29,8 @@ interface AilmentDetail {
   bodyRegion: BodyRegion;
   severityLevel: SeverityLevel;
   status: AilmentStatus;
+  priorityLevel: PriorityLevel;
+  goalTimeframe: GoalTimeframe;
   diagnosis: string | null;
   dateDiagnosed: string | null;
   notes: string | null;
@@ -49,6 +51,19 @@ const STATUS_BADGE: Record<string, string> = {
   ACTIVE: "bg-blue-100 text-blue-800",
   MANAGED: "bg-gray-100 text-gray-700",
   RESOLVED: "bg-green-100 text-green-700",
+};
+
+const PRIORITY_BADGE: Record<string, string> = {
+  HIGH: "bg-red-100 text-red-800",
+  MEDIUM: "bg-yellow-100 text-yellow-800",
+  LOW: "bg-gray-100 text-gray-600",
+};
+
+const GOAL_LABELS: Record<string, string> = {
+  ACUTE_RELIEF: "Acute Relief",
+  THIS_WEEK: "This Week",
+  THIS_MONTH: "This Month",
+  MAINTENANCE: "Maintenance",
 };
 
 const REGION_LABELS: Record<string, string> = {
@@ -146,6 +161,8 @@ export default function AilmentDetailPage({
       bodyRegion: ailment.bodyRegion,
       severityLevel: ailment.severityLevel,
       status: ailment.status,
+      priorityLevel: ailment.priorityLevel,
+      goalTimeframe: ailment.goalTimeframe,
       diagnosis: ailment.diagnosis ?? "",
       dateDiagnosed: ailment.dateDiagnosed ?? "",
       notes: ailment.notes ?? "",
@@ -194,6 +211,9 @@ export default function AilmentDetailPage({
           </span>
           <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_BADGE[ailment.status]}`}>
             {ailment.status.toLowerCase()}
+          </span>
+          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${PRIORITY_BADGE[ailment.priorityLevel]}`}>
+            {ailment.priorityLevel.toLowerCase()} priority
           </span>
         </div>
       </div>
@@ -251,6 +271,10 @@ export default function AilmentDetailPage({
                 <dd className="text-gray-900">{ailment.diagnosis}</dd>
               </div>
             )}
+            <div>
+              <dt className="text-gray-500">Goal Timeframe</dt>
+              <dd className="text-gray-900">{GOAL_LABELS[ailment.goalTimeframe] ?? ailment.goalTimeframe}</dd>
+            </div>
             {ailment.notes && (
               <div>
                 <dt className="text-gray-500">Notes</dt>

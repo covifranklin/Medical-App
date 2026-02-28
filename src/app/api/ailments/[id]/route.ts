@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/user";
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
   "HEAD", "NECK", "LEFT_SHOULDER", "RIGHT_SHOULDER", "UPPER_BACK",
@@ -13,6 +13,8 @@ const BODY_REGIONS: BodyRegion[] = [
 
 const SEVERITY_LEVELS: SeverityLevel[] = ["MILD", "MODERATE", "SEVERE", "CRITICAL"];
 const AILMENT_STATUSES: AilmentStatus[] = ["ACTIVE", "MANAGED", "RESOLVED"];
+const PRIORITY_LEVELS: PriorityLevel[] = ["HIGH", "MEDIUM", "LOW"];
+const GOAL_TIMEFRAMES: GoalTimeframe[] = ["ACUTE_RELIEF", "THIS_WEEK", "THIS_MONTH", "MAINTENANCE"];
 
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -65,6 +67,8 @@ export async function GET(
       diagnosis: ailment.diagnosis,
       dateDiagnosed: ailment.dateDiagnosed?.toISOString().split("T")[0] ?? null,
       notes: ailment.notes,
+      priorityLevel: ailment.priorityLevel,
+      goalTimeframe: ailment.goalTimeframe,
       createdAt: ailment.createdAt.toISOString(),
       updatedAt: ailment.updatedAt.toISOString(),
       painLogs: ailment.painLogs.map((log) => ({
@@ -134,6 +138,14 @@ export async function PUT(
       errors.push(`status must be one of: ${AILMENT_STATUSES.join(", ")}`);
     }
 
+    if (body.priorityLevel !== undefined && !PRIORITY_LEVELS.includes(body.priorityLevel)) {
+      errors.push(`priorityLevel must be one of: ${PRIORITY_LEVELS.join(", ")}`);
+    }
+
+    if (body.goalTimeframe !== undefined && !GOAL_TIMEFRAMES.includes(body.goalTimeframe)) {
+      errors.push(`goalTimeframe must be one of: ${GOAL_TIMEFRAMES.join(", ")}`);
+    }
+
     if (body.diagnosis !== undefined && body.diagnosis !== null) {
       if (typeof body.diagnosis === "string" && body.diagnosis.length > 1000) {
         errors.push("Diagnosis must be 1000 characters or fewer.");
@@ -162,6 +174,8 @@ export async function PUT(
     if (body.bodyRegion !== undefined) data.bodyRegion = body.bodyRegion;
     if (body.severityLevel !== undefined) data.severityLevel = body.severityLevel;
     if (body.status !== undefined) data.status = body.status;
+    if (body.priorityLevel !== undefined) data.priorityLevel = body.priorityLevel;
+    if (body.goalTimeframe !== undefined) data.goalTimeframe = body.goalTimeframe;
     if (body.diagnosis !== undefined) data.diagnosis = body.diagnosis?.trim() || null;
     if (body.notes !== undefined) data.notes = body.notes?.trim() || null;
     if (body.dateDiagnosed !== undefined) {

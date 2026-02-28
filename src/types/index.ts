@@ -1,4 +1,4 @@
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 export interface BodyMapRegion {
   id: BodyRegion;
@@ -99,3 +99,21 @@ export interface RegionData {
 export interface BodyMapData {
   regions: Record<string, RegionData>;
 }
+
+/** User preferences for daily plan generation */
+export interface UserPreferencesData {
+  id: string;
+  dailyTimeBudgetMinutes: number;
+  weeklyFocusAreas: BodyRegion[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Ailment with priority configuration */
+export interface AilmentPriority {
+  priorityLevel: PriorityLevel;
+  goalTimeframe: GoalTimeframe;
+}
+
+// Re-export Prisma enums for convenience
+export type { PriorityLevel, GoalTimeframe };
