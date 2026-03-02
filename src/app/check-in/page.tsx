@@ -262,10 +262,10 @@ export default function CheckInPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Daily Check-in</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-600">
             {today} — {ailments.length} active ailment
             {ailments.length !== 1 ? "s" : ""}
             {todayAlreadyLogged && (
@@ -276,11 +276,11 @@ export default function CheckInPage() {
           </p>
         </div>
 
-        {/* Normal Day button — top right, prominent */}
+        {/* Normal Day button */}
         <button
           onClick={handleNormalDay}
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3 md:py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 w-full sm:w-auto"
         >
           Normal Day
           <span className="text-xs font-normal opacity-80">
@@ -340,11 +340,11 @@ export default function CheckInPage() {
                         onChange={(e) =>
                           updatePainLevel(ailment.id, Number(e.target.value))
                         }
-                        className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                        className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 touch-manipulation"
                       />
                       <div className="flex items-center gap-2 shrink-0">
                         <span
-                          className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white ${painColour(entry.painLevel)}`}
+                          className={`inline-flex items-center justify-center w-9 h-9 md:w-8 md:h-8 rounded-full text-sm font-bold text-white ${painColour(entry.painLevel)}`}
                         >
                           {entry.painLevel}
                         </span>
@@ -392,17 +392,17 @@ export default function CheckInPage() {
       </div>
 
       {/* Submit */}
-      <div className="mt-8 flex items-center gap-3 pb-8">
+      <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pb-4 md:pb-8">
         <button
           onClick={() => handleSubmit(false)}
           disabled={submitting}
-          className="inline-flex items-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 md:py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
         >
           {submitting ? "Saving..." : "Save Check-in"}
         </button>
         <button
           onClick={() => router.push("/")}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 md:py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
         >
           Cancel
         </button>

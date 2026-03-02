@@ -158,12 +158,12 @@ export default function HistoryPage() {
   const mergedAilmentData = mergeAilmentTrends(ailmentTrend);
 
   return (
-    <div className="pb-8">
+    <div className="pb-4 md:pb-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex items-start justify-between gap-2 md:gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">History</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">History</h1>
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
             Pain trends, exercise tracking, and body insights.
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function HistoryPage() {
             <button
               key={r.value}
               onClick={() => setDays(r.value)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+              className={`rounded-md px-3 py-2 md:py-1.5 text-xs md:text-sm font-medium ${
                 days === r.value
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -187,7 +187,7 @@ export default function HistoryPage() {
       {/* ── 1. Per-ailment pain trend ── */}
       <section className="mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-base md:text-lg font-semibold text-gray-900">
             Pain Trends by Condition
           </h2>
           <select
@@ -205,7 +205,7 @@ export default function HistoryPage() {
         </div>
         {mergedAilmentData.length > 0 ? (
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={220}>
               <LineChart data={mergedAilmentData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis
@@ -241,12 +241,12 @@ export default function HistoryPage() {
 
       {/* ── 2. Overall pain score ── */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Overall Pain Score
         </h2>
         {data.overallPainTrend.length > 0 ? (
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={200}>
               <LineChart data={data.overallPainTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis
@@ -278,12 +278,12 @@ export default function HistoryPage() {
 
       {/* ── 3. Exercise completion rate ── */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Exercise Completion Rate
         </h2>
         {data.exerciseCompletionRate.length > 0 ? (
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.exerciseCompletionRate}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis
@@ -340,12 +340,12 @@ export default function HistoryPage() {
 
       {/* ── 4. Before/after pain comparison ── */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Pain: Before vs After Exercise
         </h2>
         {data.beforeAfterComparison.length > 0 ? (
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.beforeAfterComparison}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis
@@ -404,7 +404,7 @@ export default function HistoryPage() {
 
       {/* ── 5. Body map heatmap ── */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Body Pain Heatmap
           <span className="ml-2 text-sm font-normal text-gray-500">
             (avg over {days} days)

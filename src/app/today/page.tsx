@@ -131,21 +131,21 @@ function ExerciseTimer({ seconds }: { seconds: number }) {
             <button
               onClick={start}
               disabled={remaining === 0}
-              className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+              className="rounded bg-green-600 px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-white hover:bg-green-700 active:bg-green-800 disabled:opacity-50"
             >
               {remaining === seconds ? "Start" : "Resume"}
             </button>
           ) : (
             <button
               onClick={pause}
-              className="rounded bg-yellow-500 px-3 py-1 text-xs font-medium text-white hover:bg-yellow-600"
+              className="rounded bg-yellow-500 px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-white hover:bg-yellow-600 active:bg-yellow-700"
             >
               Pause
             </button>
           )}
           <button
             onClick={reset}
-            className="rounded border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
+            className="rounded border border-gray-300 bg-white px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
           >
             Reset
           </button>
@@ -773,14 +773,14 @@ export default function TodayPage() {
 
   // ── Plan display (features 4-7) ──
   return (
-    <div className="pb-8">
+    <div className="pb-4 md:pb-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-2 md:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
             Today&apos;s Routine
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
             {today} — {plan.totalMinutes} min plan —{" "}
             {plan.source === "AI" ? "AI-generated" : "Manual"}
           </p>
@@ -989,7 +989,7 @@ function ExerciseCard({
         <div className="flex items-start gap-3">
           <button
             onClick={onToggle}
-            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
+            className={`mt-0.5 flex h-7 w-7 md:h-5 md:w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
               pe.completed
                 ? "border-green-500 bg-green-500 text-white"
                 : "border-gray-300 hover:border-blue-400"
@@ -1059,7 +1059,7 @@ function ExerciseCard({
             <button
               onClick={() => setShowSwapMenu(!showSwapMenu)}
               disabled={swapping}
-              className="inline-flex items-center rounded border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              className="inline-flex items-center rounded border border-gray-200 bg-white px-3 py-2 md:px-2.5 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
             >
               {swapping ? "Swapping..." : "This hurts / Swap"}
             </button>
@@ -1087,7 +1087,7 @@ function ExerciseCard({
                     onSwap(reason);
                   }}
                   disabled={swapping}
-                  className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
+                  className="rounded-full border border-gray-200 bg-white px-3.5 py-2 md:px-3 md:py-1 text-xs text-gray-700 hover:bg-blue-50 hover:border-blue-300 active:bg-blue-100 disabled:opacity-50"
                 >
                   {reason}
                 </button>
