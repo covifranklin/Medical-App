@@ -1,4 +1,4 @@
-import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
+import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 export interface BodyMapRegion {
   id: BodyRegion;
@@ -50,17 +50,27 @@ export interface PlanReviewRecord {
 export interface DailyPlanExerciseItem {
   exerciseId: string;
   order: number;
+  sets: number | null;
+  reps: number | null;
+  holdSeconds: number | null;
   estimatedMinutes: number;
   reason: string;
+  targetAilment: string;
+}
+
+export interface SkippedExercise {
+  exerciseId: string;
+  exerciseName: string;
+  reason: string;
+  suggestedReturn: string;
 }
 
 export interface GeneratedDailyPlan {
+  warmUp: string;
   exercises: DailyPlanExerciseItem[];
+  coolDown: string;
   totalMinutes: number;
-  skippedExercises: Array<{
-    exerciseId: string;
-    reason: string;
-  }>;
+  skippedExercises: SkippedExercise[];
   notes: string;
 }
 
@@ -99,3 +109,21 @@ export interface RegionData {
 export interface BodyMapData {
   regions: Record<string, RegionData>;
 }
+
+/** User preferences for daily plan generation */
+export interface UserPreferencesData {
+  id: string;
+  dailyTimeBudgetMinutes: number;
+  weeklyFocusAreas: BodyRegion[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Ailment with priority configuration */
+export interface AilmentPriority {
+  priorityLevel: PriorityLevel;
+  goalTimeframe: GoalTimeframe;
+}
+
+// Re-export Prisma enums for convenience
+export type { PriorityLevel, GoalTimeframe };

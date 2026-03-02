@@ -8,8 +8,9 @@ const navItems = [
   { href: "/check-in", label: "Check-in" },
   { href: "/conditions", label: "Ailments" },
   { href: "/plans", label: "Plans" },
-  { href: "/daily", label: "Daily Routine" },
+  { href: "/today", label: "Today" },
   { href: "/history", label: "History" },
+  { href: "/settings", label: "Settings" },
 ];
 
 export default function Nav() {

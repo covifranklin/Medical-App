@@ -132,10 +132,11 @@ export async function POST(request: NextRequest) {
 
         return prisma.painLog.upsert({
           where: {
-            userId_ailmentId_date: {
+            userId_ailmentId_date_isPostExercise: {
               userId: user.id,
               ailmentId: e.ailmentId,
               date: dateOnly,
+              isPostExercise: false,
             },
           },
           update: {

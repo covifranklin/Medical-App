@@ -57,6 +57,19 @@ enum DailyPlanSource {
   MANUAL
 }
 
+enum PriorityLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum GoalTimeframe {
+  ACUTE_RELIEF  // immediate pain management
+  THIS_WEEK     // short-term goals
+  THIS_MONTH    // medium-term rehab
+  MAINTENANCE   // ongoing management
+}
+
 // ── Models ─────────────────────────────────────────────
 
 model User {
@@ -67,9 +80,20 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ailments   Ailment[]
-  dailyPlans DailyPlan[]
-  painLogs   PainLog[]
+  ailments    Ailment[]
+  dailyPlans  DailyPlan[]
+  painLogs    PainLog[]
+  preferences UserPreferences?
+}
+
+model UserPreferences {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyTimeBudgetMinutes Int      @default(30)
+  weeklyFocusAreas       Json     @default("[]") // array of BodyRegion values
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 model Ailment {
@@ -83,6 +107,8 @@ model Ailment {
   diagnosis      String?       // clinical diagnosis details
   dateDiagnosed  DateTime?
   notes          String?
+  priorityLevel  PriorityLevel @default(MEDIUM)
+  goalTimeframe  GoalTimeframe @default(THIS_MONTH)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -144,12 +170,13 @@ model PainLog {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   ailmentId String
   ailment   Ailment  @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
-  painLevel Int      // 1-10
-  notes     String?
-  date      DateTime @db.Date
-  createdAt DateTime @default(now())
+  painLevel      Int      // 1-10
+  notes          String?
+  isPostExercise Boolean  @default(false)
+  date           DateTime @db.Date
+  createdAt      DateTime @default(now())
 
-  @@unique([userId, ailmentId, date])
+  @@unique([userId, ailmentId, date, isPostExercise])
 }
 
 model DailyPlan {
