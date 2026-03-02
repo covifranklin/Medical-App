@@ -136,10 +136,11 @@ async function main() {
 
       await prisma.painLog.upsert({
         where: {
-          userId_ailmentId_date: {
+          userId_ailmentId_date_isPostExercise: {
             userId: user.id,
             ailmentId: ailment.id,
             date,
+            isPostExercise: false,
           },
         },
         update: { painLevel },

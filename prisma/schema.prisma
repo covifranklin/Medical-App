@@ -170,12 +170,13 @@ model PainLog {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   ailmentId String
   ailment   Ailment  @relation(fields: [ailmentId], references: [id], onDelete: Cascade)
-  painLevel Int      // 1-10
-  notes     String?
-  date      DateTime @db.Date
-  createdAt DateTime @default(now())
+  painLevel      Int      // 1-10
+  notes          String?
+  isPostExercise Boolean  @default(false)
+  date           DateTime @db.Date
+  createdAt      DateTime @default(now())
 
-  @@unique([userId, ailmentId, date])
+  @@unique([userId, ailmentId, date, isPostExercise])
 }
 
 model DailyPlan {

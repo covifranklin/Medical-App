@@ -161,6 +161,27 @@ function ExerciseTimer({ seconds }: { seconds: number }) {
   );
 }
 
+// ── Post-exercise types ──
+
+interface PainAssessment {
+  ailmentId: string;
+  ailmentName: string;
+  bodyRegion: string;
+  painLevel: number;
+  notes: string;
+}
+
+interface ComparisonResult {
+  ailmentId: string;
+  ailmentName: string;
+  bodyRegion: string | null;
+  prePainLevel: number | null;
+  postPainLevel: number | null;
+  change: number | null;
+}
+
+type PageView = "routine" | "summary" | "done";
+
 // ── Main Page ──
 
 export default function TodayPage() {
@@ -172,6 +193,10 @@ export default function TodayPage() {
   const [swappingId, setSwappingId] = useState<string | null>(null);
   const [showRegenerate, setShowRegenerate] = useState(false);
   const [regenTimeBudget, setRegenTimeBudget] = useState<number>(30);
+  const [view, setView] = useState<PageView>("routine");
+  const [painAssessments, setPainAssessments] = useState<PainAssessment[]>([]);
+  const [comparison, setComparison] = useState<ComparisonResult[]>([]);
+  const [savingAssessment, setSavingAssessment] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -296,6 +321,107 @@ export default function TodayPage() {
     }
   }
 
+  // ── Enter summary view ──
+  function handleFinishRoutine() {
+    if (!plan) return;
+
+    // Collect unique ailments from completed exercises
+    const ailmentMap = new Map<string, { name: string; region: string }>();
+    for (const pe of plan.exercises) {
+      if (pe.completed) {
+        const ex = pe.exercise;
+        if (!ailmentMap.has(ex.ailmentName)) {
+          ailmentMap.set(ex.ailmentName, {
+            name: ex.ailmentName,
+            region: ex.targetBodyRegion,
+          });
+        }
+      }
+    }
+
+    // We need ailment IDs — extract from exercise data
+    // The exercise card shows ailmentName but not ailmentId, so we need to
+    // deduplicate by ailmentName and use the exercise's targetBodyRegion
+    // We'll fetch the real ailment IDs from the API when saving
+    const assessments: PainAssessment[] = [];
+    const seen = new Set<string>();
+
+    for (const pe of plan.exercises) {
+      const ex = pe.exercise;
+      // Use exerciseId's parent ailment — we'll resolve this server-side
+      // For now, group by ailmentName
+      if (!seen.has(ex.ailmentName)) {
+        seen.add(ex.ailmentName);
+        assessments.push({
+          ailmentId: "", // will be resolved when saving
+          ailmentName: ex.ailmentName,
+          bodyRegion: ex.targetBodyRegion,
+          painLevel: 5,
+          notes: "",
+        });
+      }
+    }
+
+    setPainAssessments(assessments);
+    setView("summary");
+  }
+
+  // ── Save post-exercise assessment ──
+  async function handleSaveAssessment() {
+    if (!plan) return;
+    setSavingAssessment(true);
+    setError(null);
+
+    try {
+      // First, resolve ailment IDs by fetching ailments
+      const ailmentsRes = await fetch("/api/ailments?status=ACTIVE");
+      if (!ailmentsRes.ok) throw new Error("Failed to fetch ailments");
+      const ailments: Array<{ id: string; name: string }> =
+        await ailmentsRes.json();
+
+      const ailmentIdMap = new Map<string, string>();
+      for (const a of ailments) {
+        ailmentIdMap.set(a.name, a.id);
+      }
+
+      // Build entries with resolved IDs
+      const entries = painAssessments
+        .map((pa) => ({
+          ailmentId: ailmentIdMap.get(pa.ailmentName) ?? "",
+          painLevel: pa.painLevel,
+          notes: pa.notes.trim() || undefined,
+        }))
+        .filter((e) => e.ailmentId !== "");
+
+      if (entries.length === 0) {
+        setError("Could not match ailments. Please try again.");
+        setSavingAssessment(false);
+        return;
+      }
+
+      const res = await fetch("/api/pain-logs/post-exercise", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entries, dailyPlanId: plan.id }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Failed to save assessment.");
+        setSavingAssessment(false);
+        return;
+      }
+
+      const data = await res.json();
+      setComparison(data.comparison ?? []);
+      setView("done");
+    } catch {
+      setError("Network error saving assessment.");
+    } finally {
+      setSavingAssessment(false);
+    }
+  }
+
   // ── Derived state ──
   const completedCount = plan?.exercises.filter((e) => e.completed).length ?? 0;
   const totalCount = plan?.exercises.length ?? 0;
@@ -401,6 +527,287 @@ export default function TodayPage() {
     );
   }
 
+  // ── Summary stats ──
+  const completedExercises = plan?.exercises.filter((e) => e.completed) ?? [];
+  const totalTimeMin = completedExercises.reduce(
+    (sum, e) => sum + e.estimatedMinutes,
+    0
+  );
+  const regionsWorked = Array.from(
+    new Set(completedExercises.map((e) => e.exercise.targetBodyRegion))
+  );
+
+  // ── Summary view (post-exercise assessment) ──
+  if (view === "summary" && plan) {
+    return (
+      <div className="pb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Session Summary</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Great work! Rate how each area feels after exercising.
+        </p>
+
+        {/* Stats bar */}
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
+            <p className="text-2xl font-bold text-blue-600">
+              {completedExercises.length}
+              <span className="text-sm font-normal text-gray-400">
+                /{plan.exercises.length}
+              </span>
+            </p>
+            <p className="mt-1 text-xs text-gray-500">Exercises</p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
+            <p className="text-2xl font-bold text-green-600">{totalTimeMin}</p>
+            <p className="mt-1 text-xs text-gray-500">Minutes</p>
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
+            <p className="text-2xl font-bold text-purple-600">
+              {regionsWorked.length}
+            </p>
+            <p className="mt-1 text-xs text-gray-500">Regions</p>
+          </div>
+        </div>
+
+        {/* Regions worked chips */}
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {regionsWorked.map((r) => (
+            <span
+              key={r}
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-gray-100 text-gray-800"}`}
+            >
+              {REGION_LABELS[r] ?? r}
+            </span>
+          ))}
+        </div>
+
+        {/* Pain re-assessment */}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Post-Exercise Pain Check
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            How does each area feel now? This before/after data helps improve
+            future plans.
+          </p>
+
+          <div className="mt-4 space-y-4">
+            {painAssessments.map((pa, idx) => (
+              <div
+                key={pa.ailmentName}
+                className="rounded-lg border border-gray-200 bg-white p-4"
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[pa.bodyRegion] ?? "bg-gray-100 text-gray-800"}`}
+                  >
+                    {REGION_LABELS[pa.bodyRegion] ?? pa.bodyRegion}
+                  </span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {pa.ailmentName}
+                  </span>
+                </div>
+
+                {/* Pain slider */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400 w-6">1</span>
+                  <input
+                    type="range"
+                    min={1}
+                    max={10}
+                    value={pa.painLevel}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setPainAssessments((prev) =>
+                        prev.map((p, i) =>
+                          i === idx ? { ...p, painLevel: val } : p
+                        )
+                      );
+                    }}
+                    className="flex-1 accent-blue-600"
+                  />
+                  <span className="text-xs text-gray-400 w-6">10</span>
+                  <span
+                    className={`w-8 text-center text-sm font-bold ${
+                      pa.painLevel <= 3
+                        ? "text-green-600"
+                        : pa.painLevel <= 6
+                          ? "text-yellow-600"
+                          : "text-red-600"
+                    }`}
+                  >
+                    {pa.painLevel}
+                  </span>
+                </div>
+
+                {/* Notes */}
+                <input
+                  type="text"
+                  placeholder="Optional note (e.g. felt good, shoulder worse after X)"
+                  value={pa.notes}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPainAssessments((prev) =>
+                      prev.map((p, i) =>
+                        i === idx ? { ...p, notes: val } : p
+                      )
+                    );
+                  }}
+                  className="mt-2 w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 placeholder-gray-400"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={handleSaveAssessment}
+            disabled={savingAssessment}
+            className="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+          >
+            {savingAssessment ? "Saving..." : "Save Assessment"}
+          </button>
+          <button
+            onClick={() => setView("routine")}
+            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Back to Routine
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Done view (before/after comparison) ──
+  if (view === "done" && plan) {
+    return (
+      <div className="pb-8">
+        <div className="text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <svg
+              className="h-8 w-8 text-green-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+            Session Complete!
+          </h1>
+          <p className="mt-2 text-sm text-gray-500">
+            {completedExercises.length} exercises &middot; ~{totalTimeMin} min
+            &middot; {regionsWorked.length} region
+            {regionsWorked.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {/* Before / After comparison */}
+        {comparison.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">
+              Pain: Before vs After
+            </h2>
+            <div className="space-y-2">
+              {comparison.map((c) => {
+                const change = c.change ?? 0;
+                const changeLabel =
+                  change < 0
+                    ? `${change} (improved)`
+                    : change > 0
+                      ? `+${change} (worse)`
+                      : "no change";
+                const changeColour =
+                  change < 0
+                    ? "text-green-600"
+                    : change > 0
+                      ? "text-red-600"
+                      : "text-gray-500";
+
+                return (
+                  <div
+                    key={c.ailmentId}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      {c.bodyRegion && (
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[c.bodyRegion] ?? "bg-gray-100 text-gray-800"}`}
+                        >
+                          {REGION_LABELS[c.bodyRegion] ?? c.bodyRegion}
+                        </span>
+                      )}
+                      <span className="text-sm font-medium text-gray-900">
+                        {c.ailmentName}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-gray-500">
+                        {c.prePainLevel ?? "—"}
+                      </span>
+                      <span className="text-gray-300">&rarr;</span>
+                      <span className="font-medium text-gray-900">
+                        {c.postPainLevel ?? "—"}
+                      </span>
+                      <span className={`text-xs font-medium ${changeColour}`}>
+                        {c.prePainLevel != null ? changeLabel : "—"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Regions worked */}
+        <div className="mt-6">
+          <h2 className="text-sm font-semibold text-gray-700 mb-2">
+            Regions Worked
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {regionsWorked.map((r) => (
+              <span
+                key={r}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-gray-100 text-gray-800"}`}
+              >
+                {REGION_LABELS[r] ?? r}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 flex gap-3 justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+          >
+            Back to Dashboard
+          </Link>
+          <button
+            onClick={() => setView("routine")}
+            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            View Routine
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // ── Plan display (features 4-7) ──
   return (
     <div className="pb-8">
@@ -500,6 +907,20 @@ export default function TodayPage() {
           <p className="mt-2 text-sm font-medium text-green-700">
             All exercises completed! Great work today.
           </p>
+        )}
+        {completedCount > 0 && (
+          <button
+            onClick={handleFinishRoutine}
+            className={`mt-3 w-full rounded-md py-2.5 text-sm font-medium shadow-sm ${
+              progressPct === 100
+                ? "bg-green-600 text-white hover:bg-green-700"
+                : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            {progressPct === 100
+              ? "Finish & Rate How You Feel"
+              : "Finish Early & Rate How You Feel"}
+          </button>
         )}
       </div>
 
