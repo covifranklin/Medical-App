@@ -324,36 +324,14 @@ export default function TodayPage() {
   // ── Enter summary view ──
   function handleFinishRoutine() {
     if (!plan) return;
-
-    // Collect unique ailments from completed exercises
-    const ailmentMap = new Map<string, { name: string; region: string }>();
-    for (const pe of plan.exercises) {
-      if (pe.completed) {
-        const ex = pe.exercise;
-        if (!ailmentMap.has(ex.ailmentName)) {
-          ailmentMap.set(ex.ailmentName, {
-            name: ex.ailmentName,
-            region: ex.targetBodyRegion,
-          });
-        }
-      }
-    }
-
-    // We need ailment IDs — extract from exercise data
-    // The exercise card shows ailmentName but not ailmentId, so we need to
-    // deduplicate by ailmentName and use the exercise's targetBodyRegion
-    // We'll fetch the real ailment IDs from the API when saving
     const assessments: PainAssessment[] = [];
     const seen = new Set<string>();
-
     for (const pe of plan.exercises) {
       const ex = pe.exercise;
-      // Use exerciseId's parent ailment — we'll resolve this server-side
-      // For now, group by ailmentName
       if (!seen.has(ex.ailmentName)) {
         seen.add(ex.ailmentName);
         assessments.push({
-          ailmentId: "", // will be resolved when saving
+          ailmentId: "",
           ailmentName: ex.ailmentName,
           bodyRegion: ex.targetBodyRegion,
           painLevel: 5,
@@ -361,7 +339,6 @@ export default function TodayPage() {
         });
       }
     }
-
     setPainAssessments(assessments);
     setView("summary");
   }
@@ -371,20 +348,14 @@ export default function TodayPage() {
     if (!plan) return;
     setSavingAssessment(true);
     setError(null);
-
     try {
-      // First, resolve ailment IDs by fetching ailments
       const ailmentsRes = await fetch("/api/ailments?status=ACTIVE");
       if (!ailmentsRes.ok) throw new Error("Failed to fetch ailments");
       const ailments: Array<{ id: string; name: string }> =
         await ailmentsRes.json();
-
       const ailmentIdMap = new Map<string, string>();
-      for (const a of ailments) {
-        ailmentIdMap.set(a.name, a.id);
-      }
+      for (const a of ailments) ailmentIdMap.set(a.name, a.id);
 
-      // Build entries with resolved IDs
       const entries = painAssessments
         .map((pa) => ({
           ailmentId: ailmentIdMap.get(pa.ailmentName) ?? "",
@@ -590,7 +561,6 @@ export default function TodayPage() {
             How does each area feel now? This before/after data helps improve
             future plans.
           </p>
-
           <div className="mt-4 space-y-4">
             {painAssessments.map((pa, idx) => (
               <div
@@ -607,8 +577,6 @@ export default function TodayPage() {
                     {pa.ailmentName}
                   </span>
                 </div>
-
-                {/* Pain slider */}
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-400 w-6">1</span>
                   <input
@@ -639,8 +607,6 @@ export default function TodayPage() {
                     {pa.painLevel}
                   </span>
                 </div>
-
-                {/* Notes */}
                 <input
                   type="text"
                   placeholder="Optional note (e.g. felt good, shoulder worse after X)"
@@ -715,7 +681,6 @@ export default function TodayPage() {
           </p>
         </div>
 
-        {/* Before / After comparison */}
         {comparison.length > 0 && (
           <div className="mt-8">
             <h2 className="text-sm font-semibold text-gray-700 mb-3">
@@ -736,7 +701,6 @@ export default function TodayPage() {
                     : change > 0
                       ? "text-red-600"
                       : "text-gray-500";
-
                 return (
                   <div
                     key={c.ailmentId}
@@ -773,7 +737,6 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Regions worked */}
         <div className="mt-6">
           <h2 className="text-sm font-semibold text-gray-700 mb-2">
             Regions Worked

@@ -116,8 +116,7 @@ export async function POST(request: NextRequest) {
         bodyRegion: post?.ailment.bodyRegion ?? pre?.ailment.bodyRegion ?? null,
         prePainLevel: pre?.painLevel ?? null,
         postPainLevel: post?.painLevel ?? null,
-        change:
-          pre && post ? post.painLevel - pre.painLevel : null,
+        change: pre && post ? post.painLevel - pre.painLevel : null,
       };
     });
 
