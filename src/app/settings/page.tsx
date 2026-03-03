@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { SkeletonCard } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGION_OPTIONS: { value: BodyRegion; label: string }[] = [
@@ -39,7 +41,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const { toast } = useToast();
 
   const fetchPrefs = useCallback(async () => {
     try {
@@ -68,7 +70,6 @@ export default function SettingsPage() {
     if (!prefs) return;
     setSaving(true);
     setError(null);
-    setSuccess(false);
 
     try {
       const res = await fetch("/api/preferences", {
@@ -84,8 +85,7 @@ export default function SettingsPage() {
         return;
       }
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast("Preferences saved");
     } catch {
       setError("Network error.");
     } finally {
@@ -106,8 +106,12 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading settings...
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <div className="mt-6 space-y-6">
+          <SkeletonCard lines={4} />
+          <SkeletonCard lines={5} />
+        </div>
       </div>
     );
   }
@@ -130,12 +134,6 @@ export default function SettingsPage() {
       {error && (
         <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mt-4 rounded-md bg-green-50 border border-green-200 p-3 text-sm text-green-700">
-          Preferences saved.
         </div>
       )}
 

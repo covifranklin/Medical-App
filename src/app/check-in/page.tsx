@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useBodyMapStore } from "@/stores/bodyMapStore";
+import { SkeletonCheckIn } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 interface AilmentForCheckIn {
@@ -56,6 +58,7 @@ function painLabel(level: number): string {
 export default function CheckInPage() {
   const router = useRouter();
   const refreshRegions = useBodyMapStore((s) => s.refreshRegions);
+  const { toast } = useToast();
 
   const [ailments, setAilments] = useState<AilmentForCheckIn[]>([]);
   const [entries, setEntries] = useState<Record<string, PainEntry>>({});
@@ -175,7 +178,6 @@ export default function CheckInPage() {
     }));
 
     if (!isNormalDay) {
-      // Validate - for non-normal-day, just check we have entries
       if (payload.length === 0) {
         setError("No ailments to log.");
         setSubmitting(false);
@@ -183,6 +185,14 @@ export default function CheckInPage() {
       }
     }
 
+    // Optimistic: show success immediately
+    toast("Pain levels saved successfully");
+    setSubmitted(true);
+    setTimeout(() => {
+      router.push("/");
+    }, 1200);
+
+    // Fire API call in background
     try {
       const res = await fetch("/api/pain-logs", {
         method: "POST",
@@ -192,26 +202,25 @@ export default function CheckInPage() {
 
       if (!res.ok) {
         const data = await res.json();
+        // Revert optimistic update on failure
+        setSubmitted(false);
+        setSubmitting(false);
         setError(
           data.errors
             ? data.errors.join(", ")
             : data.error ?? "Failed to save."
         );
-        setSubmitting(false);
+        toast("Save failed — please try again", "error");
         return;
       }
 
       // Refresh body map store so dashboard colours update
-      await refreshRegions();
-      setSubmitted(true);
-
-      // Redirect to dashboard after a moment
-      setTimeout(() => {
-        router.push("/");
-      }, 1200);
+      refreshRegions();
     } catch {
-      setError("Network error. Please try again.");
+      setSubmitted(false);
       setSubmitting(false);
+      setError("Network error. Please try again.");
+      toast("Network error — please try again", "error");
     }
   }
 
@@ -228,8 +237,11 @@ export default function CheckInPage() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading check-in...
+      <div>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
+        <div className="mt-6">
+          <SkeletonCheckIn />
+        </div>
       </div>
     );
   }
@@ -262,10 +274,10 @@ export default function CheckInPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Daily Check-in</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-600">
             {today} — {ailments.length} active ailment
             {ailments.length !== 1 ? "s" : ""}
             {todayAlreadyLogged && (
@@ -276,11 +288,11 @@ export default function CheckInPage() {
           </p>
         </div>
 
-        {/* Normal Day button — top right, prominent */}
+        {/* Normal Day button */}
         <button
           onClick={handleNormalDay}
           disabled={submitting}
-          className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3 md:py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 w-full sm:w-auto"
         >
           Normal Day
           <span className="text-xs font-normal opacity-80">
@@ -340,11 +352,11 @@ export default function CheckInPage() {
                         onChange={(e) =>
                           updatePainLevel(ailment.id, Number(e.target.value))
                         }
-                        className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                        className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 touch-manipulation"
                       />
                       <div className="flex items-center gap-2 shrink-0">
                         <span
-                          className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white ${painColour(entry.painLevel)}`}
+                          className={`inline-flex items-center justify-center w-9 h-9 md:w-8 md:h-8 rounded-full text-sm font-bold text-white ${painColour(entry.painLevel)}`}
                         >
                           {entry.painLevel}
                         </span>
@@ -392,17 +404,17 @@ export default function CheckInPage() {
       </div>
 
       {/* Submit */}
-      <div className="mt-8 flex items-center gap-3 pb-8">
+      <div className="mt-6 md:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pb-4 md:pb-8">
         <button
           onClick={() => handleSubmit(false)}
           disabled={submitting}
-          className="inline-flex items-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 md:py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
         >
           {submitting ? "Saving..." : "Save Check-in"}
         </button>
         <button
           onClick={() => router.push("/")}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 md:py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
         >
           Cancel
         </button>

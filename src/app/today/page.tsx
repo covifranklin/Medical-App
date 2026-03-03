@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { SkeletonCard, SkeletonLine } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 
 // ── Types ──
 
@@ -131,21 +133,21 @@ function ExerciseTimer({ seconds }: { seconds: number }) {
             <button
               onClick={start}
               disabled={remaining === 0}
-              className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+              className="rounded bg-green-600 px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-white hover:bg-green-700 active:bg-green-800 disabled:opacity-50"
             >
               {remaining === seconds ? "Start" : "Resume"}
             </button>
           ) : (
             <button
               onClick={pause}
-              className="rounded bg-yellow-500 px-3 py-1 text-xs font-medium text-white hover:bg-yellow-600"
+              className="rounded bg-yellow-500 px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-white hover:bg-yellow-600 active:bg-yellow-700"
             >
               Pause
             </button>
           )}
           <button
             onClick={reset}
-            className="rounded border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
+            className="rounded border border-gray-300 bg-white px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
           >
             Reset
           </button>
@@ -185,6 +187,7 @@ type PageView = "routine" | "summary" | "done";
 // ── Main Page ──
 
 export default function TodayPage() {
+  const { toast } = useToast();
   const [plan, setPlan] = useState<DailyPlan | null>(null);
   const [hasPainLog, setHasPainLog] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
@@ -256,6 +259,7 @@ export default function TodayPage() {
       const data = await res.json();
       setPlan(data.plan);
       setShowRegenerate(false);
+      toast("Plan generated successfully");
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -263,8 +267,22 @@ export default function TodayPage() {
     }
   }
 
-  // ── Toggle exercise completion ──
+  // ── Toggle exercise completion (optimistic) ──
   async function toggleComplete(dpeId: string) {
+    // Optimistic: toggle immediately in UI
+    const prevPlan = plan;
+    setPlan((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        exercises: prev.exercises.map((e) =>
+          e.id === dpeId
+            ? { ...e, completed: !e.completed, completedAt: e.completed ? null : new Date().toISOString() }
+            : e
+        ),
+      };
+    });
+
     try {
       const res = await fetch(`/api/daily-plan/exercises/${dpeId}`, {
         method: "PATCH",
@@ -272,6 +290,7 @@ export default function TodayPage() {
       if (!res.ok) throw new Error();
       const data = await res.json();
 
+      // Reconcile with server response
       setPlan((prev) => {
         if (!prev) return prev;
         return {
@@ -284,6 +303,8 @@ export default function TodayPage() {
         };
       });
     } catch {
+      // Revert on failure
+      setPlan(prevPlan);
       setError("Failed to update exercise.");
     }
   }
@@ -324,36 +345,14 @@ export default function TodayPage() {
   // ── Enter summary view ──
   function handleFinishRoutine() {
     if (!plan) return;
-
-    // Collect unique ailments from completed exercises
-    const ailmentMap = new Map<string, { name: string; region: string }>();
-    for (const pe of plan.exercises) {
-      if (pe.completed) {
-        const ex = pe.exercise;
-        if (!ailmentMap.has(ex.ailmentName)) {
-          ailmentMap.set(ex.ailmentName, {
-            name: ex.ailmentName,
-            region: ex.targetBodyRegion,
-          });
-        }
-      }
-    }
-
-    // We need ailment IDs — extract from exercise data
-    // The exercise card shows ailmentName but not ailmentId, so we need to
-    // deduplicate by ailmentName and use the exercise's targetBodyRegion
-    // We'll fetch the real ailment IDs from the API when saving
     const assessments: PainAssessment[] = [];
     const seen = new Set<string>();
-
     for (const pe of plan.exercises) {
       const ex = pe.exercise;
-      // Use exerciseId's parent ailment — we'll resolve this server-side
-      // For now, group by ailmentName
       if (!seen.has(ex.ailmentName)) {
         seen.add(ex.ailmentName);
         assessments.push({
-          ailmentId: "", // will be resolved when saving
+          ailmentId: "",
           ailmentName: ex.ailmentName,
           bodyRegion: ex.targetBodyRegion,
           painLevel: 5,
@@ -361,7 +360,6 @@ export default function TodayPage() {
         });
       }
     }
-
     setPainAssessments(assessments);
     setView("summary");
   }
@@ -371,20 +369,14 @@ export default function TodayPage() {
     if (!plan) return;
     setSavingAssessment(true);
     setError(null);
-
     try {
-      // First, resolve ailment IDs by fetching ailments
       const ailmentsRes = await fetch("/api/ailments?status=ACTIVE");
       if (!ailmentsRes.ok) throw new Error("Failed to fetch ailments");
       const ailments: Array<{ id: string; name: string }> =
         await ailmentsRes.json();
-
       const ailmentIdMap = new Map<string, string>();
-      for (const a of ailments) {
-        ailmentIdMap.set(a.name, a.id);
-      }
+      for (const a of ailments) ailmentIdMap.set(a.name, a.id);
 
-      // Build entries with resolved IDs
       const entries = painAssessments
         .map((pa) => ({
           ailmentId: ailmentIdMap.get(pa.ailmentName) ?? "",
@@ -414,6 +406,7 @@ export default function TodayPage() {
 
       const data = await res.json();
       setComparison(data.comparison ?? []);
+      toast("Assessment saved");
       setView("done");
     } catch {
       setError("Network error saving assessment.");
@@ -453,8 +446,18 @@ export default function TodayPage() {
   // ── Loading state ──
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading today&apos;s routine...
+      <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <SkeletonLine width="w-48" height="h-7" />
+            <SkeletonLine width="w-32" height="h-4" />
+          </div>
+        </div>
+        <div className="mt-6 space-y-3">
+          <SkeletonCard lines={3} />
+          <SkeletonCard lines={3} />
+          <SkeletonCard lines={3} />
+        </div>
       </div>
     );
   }
@@ -590,7 +593,6 @@ export default function TodayPage() {
             How does each area feel now? This before/after data helps improve
             future plans.
           </p>
-
           <div className="mt-4 space-y-4">
             {painAssessments.map((pa, idx) => (
               <div
@@ -607,8 +609,6 @@ export default function TodayPage() {
                     {pa.ailmentName}
                   </span>
                 </div>
-
-                {/* Pain slider */}
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-400 w-6">1</span>
                   <input
@@ -639,8 +639,6 @@ export default function TodayPage() {
                     {pa.painLevel}
                   </span>
                 </div>
-
-                {/* Notes */}
                 <input
                   type="text"
                   placeholder="Optional note (e.g. felt good, shoulder worse after X)"
@@ -715,7 +713,6 @@ export default function TodayPage() {
           </p>
         </div>
 
-        {/* Before / After comparison */}
         {comparison.length > 0 && (
           <div className="mt-8">
             <h2 className="text-sm font-semibold text-gray-700 mb-3">
@@ -736,7 +733,6 @@ export default function TodayPage() {
                     : change > 0
                       ? "text-red-600"
                       : "text-gray-500";
-
                 return (
                   <div
                     key={c.ailmentId}
@@ -773,7 +769,6 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Regions worked */}
         <div className="mt-6">
           <h2 className="text-sm font-semibold text-gray-700 mb-2">
             Regions Worked
@@ -810,14 +805,14 @@ export default function TodayPage() {
 
   // ── Plan display (features 4-7) ──
   return (
-    <div className="pb-8">
+    <div className="pb-4 md:pb-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-2 md:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
             Today&apos;s Routine
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
             {today} — {plan.totalMinutes} min plan —{" "}
             {plan.source === "AI" ? "AI-generated" : "Manual"}
           </p>
@@ -1026,7 +1021,7 @@ function ExerciseCard({
         <div className="flex items-start gap-3">
           <button
             onClick={onToggle}
-            className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
+            className={`mt-0.5 flex h-7 w-7 md:h-5 md:w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
               pe.completed
                 ? "border-green-500 bg-green-500 text-white"
                 : "border-gray-300 hover:border-blue-400"
@@ -1096,7 +1091,7 @@ function ExerciseCard({
             <button
               onClick={() => setShowSwapMenu(!showSwapMenu)}
               disabled={swapping}
-              className="inline-flex items-center rounded border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              className="inline-flex items-center rounded border border-gray-200 bg-white px-3 py-2 md:px-2.5 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
             >
               {swapping ? "Swapping..." : "This hurts / Swap"}
             </button>
@@ -1124,7 +1119,7 @@ function ExerciseCard({
                     onSwap(reason);
                   }}
                   disabled={swapping}
-                  className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
+                  className="rounded-full border border-gray-200 bg-white px-3.5 py-2 md:px-3 md:py-1 text-xs text-gray-700 hover:bg-blue-50 hover:border-blue-300 active:bg-blue-100 disabled:opacity-50"
                 >
                   {reason}
                 </button>
