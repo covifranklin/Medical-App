@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AilmentForm from "@/components/ailments/AilmentForm";
+import { SkeletonPlanDetail } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 import type { AilmentFormData } from "@/components/ailments/AilmentForm";
 import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
@@ -83,6 +85,7 @@ export default function AilmentDetailPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [ailment, setAilment] = useState<AilmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +124,7 @@ export default function AilmentDetailPage({
         method: "DELETE",
       });
       if (res.ok) {
+        toast("Ailment deleted");
         router.push("/conditions");
         router.refresh();
       } else {
@@ -135,11 +139,7 @@ export default function AilmentDetailPage({
   }
 
   if (loading) {
-    return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading ailment...
-      </div>
-    );
+    return <SkeletonPlanDetail />;
   }
 
   if (error || !ailment) {

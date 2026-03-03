@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getRegionLabel } from "@/components/body-map/regions";
 import { getColourForPainLevel } from "@/components/body-map/colours";
+import { SkeletonDashboardSummary } from "@/components/shared/Skeleton";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 interface AilmentSummaryData {
@@ -57,15 +58,39 @@ export default function DashboardSummary() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="mt-8 text-center text-sm text-gray-400">
-        Loading summary...
-      </div>
-    );
+    return <SkeletonDashboardSummary />;
   }
 
   if (!data || data.ailments.length === 0) {
-    return null;
+    return (
+      <div className="mt-8 rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+        <svg
+          className="mx-auto h-10 w-10 text-gray-300"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+          />
+        </svg>
+        <p className="mt-3 text-sm font-medium text-gray-500">
+          No ailments tracked yet
+        </p>
+        <p className="mt-1 text-sm text-gray-400">
+          Click a body region above or add an ailment to start tracking.
+        </p>
+        <Link
+          href="/conditions/new"
+          className="mt-4 inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Add your first ailment
+        </Link>
+      </div>
+    );
   }
 
   return (

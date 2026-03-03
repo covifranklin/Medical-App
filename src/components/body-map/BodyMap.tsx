@@ -8,6 +8,7 @@ import { FrontOutline, BackOutline } from "./BodyOutline";
 import BodyRegionPath from "./BodyRegionPath";
 import RegionDetailPanel from "./RegionDetailPanel";
 import SeverityLegend from "./SeverityLegend";
+import { SkeletonBodyMap } from "@/components/shared/Skeleton";
 import type { BodyRegion } from "@prisma/client";
 
 export default function BodyMap() {
@@ -52,11 +53,7 @@ export default function BodyMap() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-sm text-gray-500">Loading body map...</div>
-      </div>
-    );
+    return <SkeletonBodyMap />;
   }
 
   // Deduplicate regions for the list view (some appear in both front and back)

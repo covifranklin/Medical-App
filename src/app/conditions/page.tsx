@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { SkeletonAilmentList } from "@/components/shared/Skeleton";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 interface AilmentListItem {
@@ -101,19 +102,35 @@ export default function AilmentsPage() {
       {/* List */}
       <div className="mt-4">
         {loading ? (
-          <div className="py-12 text-center text-sm text-gray-500">
-            Loading ailments...
-          </div>
+          <SkeletonAilmentList count={3} />
         ) : ailments.length === 0 ? (
           <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-            <p className="text-gray-500">
+            <svg
+              className="mx-auto h-10 w-10 text-gray-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+              />
+            </svg>
+            <p className="mt-3 text-sm font-medium text-gray-500">
               {filter === "ALL"
-                ? "No ailments recorded yet."
-                : `No ${filter.toLowerCase()} ailments.`}
+                ? "No ailments recorded yet"
+                : `No ${filter.toLowerCase()} ailments`}
             </p>
+            {filter === "ALL" && (
+              <p className="mt-1 text-sm text-gray-400">
+                Track your conditions to get personalised exercise plans.
+              </p>
+            )}
             <Link
               href="/conditions/new"
-              className="mt-3 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="mt-4 inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
             >
               Add your first ailment
             </Link>

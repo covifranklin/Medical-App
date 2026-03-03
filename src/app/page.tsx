@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BodyMap from "@/components/body-map/BodyMap";
 import DashboardSummary from "@/components/dashboard/DashboardSummary";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 
 export default function DashboardPage() {
   return (
@@ -19,8 +20,12 @@ export default function DashboardPage() {
           Daily Check-in
         </Link>
       </div>
-      <BodyMap />
-      <DashboardSummary />
+      <ErrorBoundary section="Body Map">
+        <BodyMap />
+      </ErrorBoundary>
+      <ErrorBoundary section="Ailment Summary">
+        <DashboardSummary />
+      </ErrorBoundary>
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
+import { SkeletonCard, SkeletonLine } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 
 // ── Types ──
 
@@ -185,6 +187,7 @@ type PageView = "routine" | "summary" | "done";
 // ── Main Page ──
 
 export default function TodayPage() {
+  const { toast } = useToast();
   const [plan, setPlan] = useState<DailyPlan | null>(null);
   const [hasPainLog, setHasPainLog] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
@@ -256,6 +259,7 @@ export default function TodayPage() {
       const data = await res.json();
       setPlan(data.plan);
       setShowRegenerate(false);
+      toast("Plan generated successfully");
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -263,8 +267,22 @@ export default function TodayPage() {
     }
   }
 
-  // ── Toggle exercise completion ──
+  // ── Toggle exercise completion (optimistic) ──
   async function toggleComplete(dpeId: string) {
+    // Optimistic: toggle immediately in UI
+    const prevPlan = plan;
+    setPlan((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        exercises: prev.exercises.map((e) =>
+          e.id === dpeId
+            ? { ...e, completed: !e.completed, completedAt: e.completed ? null : new Date().toISOString() }
+            : e
+        ),
+      };
+    });
+
     try {
       const res = await fetch(`/api/daily-plan/exercises/${dpeId}`, {
         method: "PATCH",
@@ -272,6 +290,7 @@ export default function TodayPage() {
       if (!res.ok) throw new Error();
       const data = await res.json();
 
+      // Reconcile with server response
       setPlan((prev) => {
         if (!prev) return prev;
         return {
@@ -284,6 +303,8 @@ export default function TodayPage() {
         };
       });
     } catch {
+      // Revert on failure
+      setPlan(prevPlan);
       setError("Failed to update exercise.");
     }
   }
@@ -385,6 +406,7 @@ export default function TodayPage() {
 
       const data = await res.json();
       setComparison(data.comparison ?? []);
+      toast("Assessment saved");
       setView("done");
     } catch {
       setError("Network error saving assessment.");
@@ -424,8 +446,18 @@ export default function TodayPage() {
   // ── Loading state ──
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading today&apos;s routine...
+      <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <SkeletonLine width="w-48" height="h-7" />
+            <SkeletonLine width="w-32" height="h-4" />
+          </div>
+        </div>
+        <div className="mt-6 space-y-3">
+          <SkeletonCard lines={3} />
+          <SkeletonCard lines={3} />
+          <SkeletonCard lines={3} />
+        </div>
       </div>
     );
   }

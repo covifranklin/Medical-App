@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useBodyMapStore } from "@/stores/bodyMapStore";
+import { SkeletonCheckIn } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 import type { BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
 
 interface AilmentForCheckIn {
@@ -56,6 +58,7 @@ function painLabel(level: number): string {
 export default function CheckInPage() {
   const router = useRouter();
   const refreshRegions = useBodyMapStore((s) => s.refreshRegions);
+  const { toast } = useToast();
 
   const [ailments, setAilments] = useState<AilmentForCheckIn[]>([]);
   const [entries, setEntries] = useState<Record<string, PainEntry>>({});
@@ -175,7 +178,6 @@ export default function CheckInPage() {
     }));
 
     if (!isNormalDay) {
-      // Validate - for non-normal-day, just check we have entries
       if (payload.length === 0) {
         setError("No ailments to log.");
         setSubmitting(false);
@@ -183,6 +185,14 @@ export default function CheckInPage() {
       }
     }
 
+    // Optimistic: show success immediately
+    toast("Pain levels saved successfully");
+    setSubmitted(true);
+    setTimeout(() => {
+      router.push("/");
+    }, 1200);
+
+    // Fire API call in background
     try {
       const res = await fetch("/api/pain-logs", {
         method: "POST",
@@ -192,26 +202,25 @@ export default function CheckInPage() {
 
       if (!res.ok) {
         const data = await res.json();
+        // Revert optimistic update on failure
+        setSubmitted(false);
+        setSubmitting(false);
         setError(
           data.errors
             ? data.errors.join(", ")
             : data.error ?? "Failed to save."
         );
-        setSubmitting(false);
+        toast("Save failed — please try again", "error");
         return;
       }
 
       // Refresh body map store so dashboard colours update
-      await refreshRegions();
-      setSubmitted(true);
-
-      // Redirect to dashboard after a moment
-      setTimeout(() => {
-        router.push("/");
-      }, 1200);
+      refreshRegions();
     } catch {
-      setError("Network error. Please try again.");
+      setSubmitted(false);
       setSubmitting(false);
+      setError("Network error. Please try again.");
+      toast("Network error — please try again", "error");
     }
   }
 
@@ -228,8 +237,11 @@ export default function CheckInPage() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading check-in...
+      <div>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
+        <div className="mt-6">
+          <SkeletonCheckIn />
+        </div>
       </div>
     );
   }

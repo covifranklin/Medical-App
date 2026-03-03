@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { SkeletonCharts } from "@/components/shared/Skeleton";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import {
   LineChart,
   Line,
@@ -131,8 +133,18 @@ export default function HistoryPage() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading analytics...
+      <div>
+        <div className="flex items-start justify-between gap-2 md:gap-4 flex-wrap">
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">History</h1>
+            <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
+              Pain trends, exercise tracking, and body insights.
+            </p>
+          </div>
+        </div>
+        <div className="mt-6">
+          <SkeletonCharts />
+        </div>
       </div>
     );
   }
@@ -185,6 +197,7 @@ export default function HistoryPage() {
       </div>
 
       {/* ── 1. Per-ailment pain trend ── */}
+      <ErrorBoundary section="Pain Trends">
       <section className="mt-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base md:text-lg font-semibold text-gray-900">
@@ -238,8 +251,10 @@ export default function HistoryPage() {
           <EmptyChart message="No pain data logged yet." />
         )}
       </section>
+      </ErrorBoundary>
 
       {/* ── 2. Overall pain score ── */}
+      <ErrorBoundary section="Overall Pain">
       <section className="mt-8">
         <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Overall Pain Score
@@ -275,8 +290,10 @@ export default function HistoryPage() {
           <EmptyChart message="No pain data logged yet." />
         )}
       </section>
+      </ErrorBoundary>
 
       {/* ── 3. Exercise completion rate ── */}
+      <ErrorBoundary section="Exercise Completion">
       <section className="mt-8">
         <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Exercise Completion Rate
@@ -337,8 +354,10 @@ export default function HistoryPage() {
           <EmptyChart message="No exercise plans generated yet." />
         )}
       </section>
+      </ErrorBoundary>
 
       {/* ── 4. Before/after pain comparison ── */}
+      <ErrorBoundary section="Before/After Comparison">
       <section className="mt-8">
         <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Pain: Before vs After Exercise
@@ -401,8 +420,10 @@ export default function HistoryPage() {
           <EmptyChart message="Complete a check-in before and after exercise to see comparisons." />
         )}
       </section>
+      </ErrorBoundary>
 
       {/* ── 5. Body map heatmap ── */}
+      <ErrorBoundary section="Body Heatmap">
       <section className="mt-8">
         <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
           Body Pain Heatmap
@@ -416,6 +437,7 @@ export default function HistoryPage() {
           <EmptyChart message="No pain data to show on the heatmap." />
         )}
       </section>
+      </ErrorBoundary>
     </div>
   );
 }

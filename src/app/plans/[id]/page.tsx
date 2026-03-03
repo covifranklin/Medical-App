@@ -6,6 +6,8 @@ import Link from "next/link";
 import PlanForm from "@/components/plans/PlanForm";
 import ExerciseForm from "@/components/plans/ExerciseForm";
 import AIReviewDisplay from "@/components/plans/AIReviewDisplay";
+import { SkeletonPlanDetail } from "@/components/shared/Skeleton";
+import { useToast } from "@/components/shared/Toast";
 import type { PlanFormData } from "@/components/plans/PlanForm";
 import type { PlanReviewResult } from "@/types";
 import type { ExerciseFrequency, BodyRegion, SeverityLevel, AilmentStatus } from "@prisma/client";
@@ -88,6 +90,7 @@ export default function PlanDetailPage({
   params: { id: string };
 }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [plan, setPlan] = useState<PlanDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +139,7 @@ export default function PlanDetailPage({
         method: "DELETE",
       });
       if (res.ok) {
+        toast("Plan deleted");
         router.push(`/conditions/${plan!.ailmentId}`);
         router.refresh();
       } else {
@@ -156,6 +160,7 @@ export default function PlanDetailPage({
         method: "DELETE",
       });
       if (res.ok) {
+        toast("Exercise deleted");
         fetchPlan();
       } else {
         const data = await res.json();
@@ -218,6 +223,7 @@ export default function PlanDetailPage({
       }
       // Refresh plan to get the new latestReview
       await fetchPlan();
+      toast("AI review complete");
     } catch {
       setReviewError("Network error. Please try again.");
     } finally {
@@ -226,11 +232,7 @@ export default function PlanDetailPage({
   }
 
   if (loading) {
-    return (
-      <div className="py-12 text-center text-sm text-gray-500">
-        Loading treatment plan...
-      </div>
-    );
+    return <SkeletonPlanDetail />;
   }
 
   if (error || !plan) {
