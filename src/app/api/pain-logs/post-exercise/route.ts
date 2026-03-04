@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 // POST /api/pain-logs/post-exercise — save post-exercise pain assessments
 export async function POST(request: NextRequest) {
@@ -127,10 +127,6 @@ export async function POST(request: NextRequest) {
       message: "Post-exercise pain logs saved.",
     });
   } catch (error) {
-    console.error("Failed to save post-exercise pain logs:", error);
-    return NextResponse.json(
-      { error: "Failed to save post-exercise pain logs" },
-      { status: 500 }
-    );
+    return handleApiError(error, "save post-exercise pain logs");
   }
 }

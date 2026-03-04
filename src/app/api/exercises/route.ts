@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -46,10 +46,6 @@ export async function GET(request: NextRequest) {
       }))
     );
   } catch (error) {
-    console.error("Failed to fetch exercises:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch exercises" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch exercises");
   }
 }

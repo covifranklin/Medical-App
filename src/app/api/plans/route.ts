@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
-// GET /api/plans — list all treatment plans
+// GET /api/plans — list all treatment plans (stub — use /api/ailments/[id]/plans instead)
 export async function GET() {
-  // TODO: Phase 2 — fetch plans from database
-  return NextResponse.json({ plans: [] });
+  try {
+    await getCurrentUser();
+    return NextResponse.json({ plans: [] });
+  } catch (error) {
+    return handleApiError(error, "fetch plans");
+  }
 }
 
-// POST /api/plans — create a new treatment plan
+// POST /api/plans — create a new treatment plan (stub)
 export async function POST() {
-  // TODO: Phase 2 — create plan in database
-  return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  try {
+    await getCurrentUser();
+    return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  } catch (error) {
+    return handleApiError(error, "create plan");
+  }
 }

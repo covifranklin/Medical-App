@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -129,11 +129,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Failed to fetch ailments:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch ailments" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch ailments");
   }
 }
 
@@ -166,10 +162,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(ailment, { status: 201 });
   } catch (error) {
-    console.error("Failed to create ailment:", error);
-    return NextResponse.json(
-      { error: "Failed to create ailment" },
-      { status: 500 }
-    );
+    return handleApiError(error, "create ailment");
   }
 }

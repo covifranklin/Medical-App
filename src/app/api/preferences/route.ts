@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -34,11 +34,7 @@ export async function GET() {
       updatedAt: prefs.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("Failed to fetch preferences:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch preferences" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch preferences");
   }
 }
 
@@ -98,10 +94,6 @@ export async function PUT(request: NextRequest) {
       updatedAt: prefs.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("Failed to update preferences:", error);
-    return NextResponse.json(
-      { error: "Failed to update preferences" },
-      { status: 500 }
-    );
+    return handleApiError(error, "update preferences");
   }
 }

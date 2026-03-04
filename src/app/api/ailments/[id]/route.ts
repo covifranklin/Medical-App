@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion, SeverityLevel, AilmentStatus, PriorityLevel, GoalTimeframe } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -87,11 +87,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error("Failed to fetch ailment:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch ailment" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch ailment");
   }
 }
 
@@ -189,11 +185,7 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Failed to update ailment:", error);
-    return NextResponse.json(
-      { error: "Failed to update ailment" },
-      { status: 500 }
-    );
+    return handleApiError(error, "update ailment");
   }
 }
 
@@ -221,10 +213,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete ailment:", error);
-    return NextResponse.json(
-      { error: "Failed to delete ailment" },
-      { status: 500 }
-    );
+    return handleApiError(error, "delete ailment");
   }
 }

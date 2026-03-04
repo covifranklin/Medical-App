@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 // PATCH /api/daily-plan/exercises/[id] — toggle exercise completion
 export async function PATCH(
@@ -39,10 +39,6 @@ export async function PATCH(
       completedAt: updated.completedAt?.toISOString() ?? null,
     });
   } catch (error) {
-    console.error("Failed to toggle exercise completion:", error);
-    return NextResponse.json(
-      { error: "Failed to update exercise" },
-      { status: 500 }
-    );
+    return handleApiError(error, "toggle exercise completion");
   }
 }

@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
-// GET /api/conditions — list all ailments
+// GET /api/conditions — list all ailments (stub — use /api/ailments instead)
 export async function GET() {
-  // TODO: Phase 1 — fetch ailments from database
-  return NextResponse.json({ ailments: [] });
+  try {
+    await getCurrentUser();
+    return NextResponse.json({ ailments: [] });
+  } catch (error) {
+    return handleApiError(error, "fetch conditions");
+  }
 }
 
-// POST /api/conditions — create a new ailment
+// POST /api/conditions — create a new ailment (stub — use /api/ailments instead)
 export async function POST() {
-  // TODO: Phase 1 — create ailment in database
-  return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  try {
+    await getCurrentUser();
+    return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  } catch (error) {
+    return handleApiError(error, "create condition");
+  }
 }

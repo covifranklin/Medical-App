@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
 import { PLAN_REVIEW_SYSTEM, buildPlanReviewPrompt } from "@/lib/prompts/plan-review";
 import type { Prisma } from "@prisma/client";
@@ -61,11 +61,7 @@ export async function GET(
       }))
     );
   } catch (error) {
-    console.error("Failed to fetch plan reviews:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch plan reviews" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch plan reviews");
   }
 }
 
@@ -203,10 +199,6 @@ export async function POST(
       createdAt: review.createdAt.toISOString(),
     }, { status: 201 });
   } catch (error) {
-    console.error("Failed to generate AI review:", error);
-    return NextResponse.json(
-      { error: "Failed to generate AI review" },
-      { status: 500 }
-    );
+    return handleApiError(error, "generate AI review");
   }
 }

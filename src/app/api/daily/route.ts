@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 function getToday(): Date {
@@ -73,10 +73,6 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Failed to fetch daily plan:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch daily plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch daily plan");
   }
 }

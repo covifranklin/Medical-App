@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -77,11 +77,7 @@ export async function GET(
 
     return NextResponse.json(exercises.map(serializeExercise));
   } catch (error) {
-    console.error("Failed to fetch exercises:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch exercises" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch exercises");
   }
 }
 
@@ -207,10 +203,6 @@ export async function POST(
 
     return NextResponse.json(serializeExercise(exercise), { status: 201 });
   } catch (error) {
-    console.error("Failed to create exercise:", error);
-    return NextResponse.json(
-      { error: "Failed to create exercise" },
-      { status: 500 }
-    );
+    return handleApiError(error, "create exercise");
   }
 }

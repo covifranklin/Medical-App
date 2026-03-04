@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 // GET /api/pain-logs/summary
 export async function GET() {
@@ -75,10 +75,6 @@ export async function GET() {
 
     return NextResponse.json({ loggedToday, ailments: result });
   } catch (error) {
-    console.error("Failed to fetch pain log summary:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch pain log summary" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch pain log summary");
   }
 }

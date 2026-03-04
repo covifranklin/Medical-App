@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
-// POST /api/log — create a pain log entry
+// POST /api/log — create a pain log entry (stub — use /api/pain-logs instead)
 export async function POST() {
-  // TODO: Phase 3 — create pain log entry in database
-  return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  try {
+    await getCurrentUser();
+    return NextResponse.json({ message: "Not implemented" }, { status: 501 });
+  } catch (error) {
+    return handleApiError(error, "create log entry");
+  }
 }

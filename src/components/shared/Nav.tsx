@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 const navItems = [
   { href: "/", label: "Body Map" },
@@ -23,6 +24,16 @@ const mobileTabItems = [
 
 export default function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = useCallback(async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  }, [router]);
+
+  // Don't render nav on login/register pages
+  if (pathname === "/login" || pathname === "/register") return null;
 
   function isActive(href: string) {
     return href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -37,7 +48,7 @@ export default function Nav() {
             <Link href="/" className="text-lg font-semibold text-gray-900">
               PhysioTracker
             </Link>
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -51,6 +62,12 @@ export default function Nav() {
                   {item.label}
                 </Link>
               ))}
+              <button
+                onClick={handleLogout}
+                className="ml-2 rounded-md px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>
