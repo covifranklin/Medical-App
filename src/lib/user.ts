@@ -1,22 +1,48 @@
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { validateSession } from "@/lib/auth";
 
-const DEFAULT_USER_EMAIL = "default@physiotracker.local";
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
 
 /**
- * Get the current user. In single-user mode, returns the default user.
- * When auth is added later, this will read from session/cookie instead.
+ * Get the current authenticated user from the session cookie.
+ * Throws AuthError if not authenticated.
  */
 export async function getCurrentUser() {
-  const user = await prisma.user.upsert({
-    where: { email: DEFAULT_USER_EMAIL },
-    update: {},
-    create: {
-      email: DEFAULT_USER_EMAIL,
-      name: "Default User",
-      password: "not-set",
-    },
+  const session = await validateSession();
+  if (!session) {
+    throw new AuthError("Not authenticated");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
   });
+
+  if (!user) {
+    throw new AuthError("User not found");
+  }
+
   return user;
+}
+
+/**
+ * Standard error handler for API routes.
+ * Returns 401 for auth errors, 500 for everything else.
+ */
+export function handleApiError(error: unknown, context: string) {
+  if (error instanceof AuthError) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  console.error(`Failed to ${context}:`, error);
+  return NextResponse.json(
+    { error: `Failed to ${context}` },
+    { status: 500 }
+  );
 }
 
 /**

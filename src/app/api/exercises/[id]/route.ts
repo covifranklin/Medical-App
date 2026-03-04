@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser, verifyExerciseOwnership } from "@/lib/user";
+import { getCurrentUser, handleApiError, verifyExerciseOwnership } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
 const BODY_REGIONS: BodyRegion[] = [
@@ -51,11 +51,7 @@ export async function GET(
       updatedAt: exercise.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("Failed to fetch exercise:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch exercise" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch exercise");
   }
 }
 
@@ -198,11 +194,7 @@ export async function PUT(
       updatedAt: updated.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("Failed to update exercise:", error);
-    return NextResponse.json(
-      { error: "Failed to update exercise" },
-      { status: 500 }
-    );
+    return handleApiError(error, "update exercise");
   }
 }
 
@@ -228,10 +220,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete exercise:", error);
-    return NextResponse.json(
-      { error: "Failed to delete exercise" },
-      { status: 500 }
-    );
+    return handleApiError(error, "delete exercise");
   }
 }

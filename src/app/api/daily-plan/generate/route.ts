@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
 import {
   DAILY_PLAN_SYSTEM,
@@ -438,10 +438,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to generate daily plan:", error);
-    return NextResponse.json(
-      { error: "Failed to generate daily plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "generate daily plan");
   }
 }

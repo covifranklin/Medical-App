@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { ExerciseFrequency } from "@prisma/client";
 
 const EXERCISE_FREQUENCIES: ExerciseFrequency[] = [
@@ -95,11 +95,7 @@ export async function GET(
         : null,
     });
   } catch (error) {
-    console.error("Failed to fetch treatment plan:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch treatment plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch treatment plan");
   }
 }
 
@@ -193,11 +189,7 @@ export async function PUT(
       updatedAt: updated.updatedAt.toISOString(),
     });
   } catch (error) {
-    console.error("Failed to update treatment plan:", error);
-    return NextResponse.json(
-      { error: "Failed to update treatment plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "update treatment plan");
   }
 }
 
@@ -225,10 +217,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete treatment plan:", error);
-    return NextResponse.json(
-      { error: "Failed to delete treatment plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "delete treatment plan");
   }
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { AilmentWithPain, RegionData } from "@/types";
 import type { BodyRegion } from "@prisma/client";
 
@@ -62,10 +62,6 @@ export async function GET() {
 
     return NextResponse.json({ regions });
   } catch (error) {
-    console.error("Failed to fetch body map data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch body map data" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch body map data");
   }
 }

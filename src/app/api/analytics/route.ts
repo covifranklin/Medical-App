@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 // GET /api/analytics?days=30
 // Returns all data needed for the history/analytics page in one request
@@ -255,10 +255,6 @@ export async function GET(request: NextRequest) {
       bodyMapHeatmap,
     });
   } catch (error) {
-    console.error("Failed to fetch analytics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch analytics data" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch analytics data");
   }
 }

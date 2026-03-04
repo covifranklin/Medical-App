@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser, verifyAilmentOwnership } from "@/lib/user";
+import { getCurrentUser, handleApiError, verifyAilmentOwnership } from "@/lib/user";
 import type { ExerciseFrequency } from "@prisma/client";
 
 const EXERCISE_FREQUENCIES: ExerciseFrequency[] = [
@@ -55,11 +55,7 @@ export async function GET(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Failed to fetch treatment plans:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch treatment plans" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch treatment plans");
   }
 }
 
@@ -148,10 +144,6 @@ export async function POST(
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to create treatment plan:", error);
-    return NextResponse.json(
-      { error: "Failed to create treatment plan" },
-      { status: 500 }
-    );
+    return handleApiError(error, "create treatment plan");
   }
 }

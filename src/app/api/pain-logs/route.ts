@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/user";
+import { getCurrentUser, handleApiError } from "@/lib/user";
 
 // GET /api/pain-logs?date=2026-02-23&ailmentId=xxx
 export async function GET(request: NextRequest) {
@@ -47,11 +47,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Failed to fetch pain logs:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch pain logs" },
-      { status: 500 }
-    );
+    return handleApiError(error, "fetch pain logs");
   }
 }
 
@@ -159,10 +155,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to save pain logs:", error);
-    return NextResponse.json(
-      { error: "Failed to save pain logs" },
-      { status: 500 }
-    );
+    return handleApiError(error, "save pain logs");
   }
 }
