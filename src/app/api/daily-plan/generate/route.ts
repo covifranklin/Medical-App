@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
+import { checkDailyRateLimit } from "@/lib/rate-limit";
 import {
   DAILY_PLAN_SYSTEM,
   buildDailyPlanPrompt,
@@ -150,6 +151,15 @@ export async function POST(request: NextRequest) {
           message: "Returning existing plan for today.",
         });
       }
+    }
+
+    // Rate limit: 3 AI daily plan generations per day per user
+    const rl = checkDailyRateLimit(user.id, "daily-plan-generate", 3);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Daily plan generation limit reached (3/day). Resets in ${Math.ceil(rl.resetInSeconds / 3600)} hours.` },
+        { status: 429, headers: { "Retry-After": String(rl.resetInSeconds) } }
+      );
     }
 
     // ── Gather all context data in parallel ──

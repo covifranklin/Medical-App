@@ -64,3 +64,46 @@ export function rateLimitKey(request: Request): string {
   const url = new URL(request.url);
   return `${ip}:${url.pathname}`;
 }
+
+// ── Daily rate limiter (for AI endpoints) ───────────────
+
+const dailyStore = new Map<string, { count: number; resetAt: number }>();
+
+/**
+ * Check a daily rate limit keyed by userId + action.
+ * Resets at midnight UTC each day.
+ */
+export function checkDailyRateLimit(
+  userId: string,
+  action: string,
+  maxPerDay: number
+): { allowed: boolean; remaining: number; resetInSeconds: number } {
+  const now = Date.now();
+  const key = `daily:${userId}:${action}`;
+
+  // Clean up expired daily entries
+  dailyStore.forEach((entry, k) => {
+    if (entry.resetAt < now) dailyStore.delete(k);
+  });
+
+  const entry = dailyStore.get(key);
+
+  // Calculate next midnight UTC
+  const tomorrow = new Date();
+  tomorrow.setUTCHours(24, 0, 0, 0);
+  const resetAt = tomorrow.getTime();
+  const resetInSeconds = Math.ceil((resetAt - now) / 1000);
+
+  if (!entry || entry.resetAt < now) {
+    dailyStore.set(key, { count: 1, resetAt });
+    return { allowed: true, remaining: maxPerDay - 1, resetInSeconds };
+  }
+
+  entry.count++;
+
+  if (entry.count > maxPerDay) {
+    return { allowed: false, remaining: 0, resetInSeconds };
+  }
+
+  return { allowed: true, remaining: maxPerDay - entry.count, resetInSeconds };
+}
