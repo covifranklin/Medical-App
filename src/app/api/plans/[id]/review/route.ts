@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
 import { PLAN_REVIEW_SYSTEM, buildPlanReviewPrompt } from "@/lib/prompts/plan-review";
+import { checkDailyRateLimit } from "@/lib/rate-limit";
 import type { Prisma } from "@prisma/client";
 import type { PlanReviewResult } from "@/types";
 
@@ -77,6 +78,15 @@ export async function POST(
     }
 
     const user = await getCurrentUser();
+
+    // Rate limit: 10 AI reviews per day per user
+    const rl = checkDailyRateLimit(user.id, "plan-review", 10);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Daily AI review limit reached (10/day). Resets in ${Math.ceil(rl.resetInSeconds / 3600)} hours.` },
+        { status: 429, headers: { "Retry-After": String(rl.resetInSeconds) } }
+      );
+    }
 
     // Fetch the plan with its ailment and exercises — verify user ownership
     const plan = await prisma.treatmentPlan.findFirst({

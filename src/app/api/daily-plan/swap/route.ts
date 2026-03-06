@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
+import { checkDailyRateLimit } from "@/lib/rate-limit";
 
 const MODEL_ID = "claude-sonnet-4-5-20241022";
 
@@ -20,6 +21,16 @@ const REGION_LABELS: Record<string, string> = {
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
+
+    // Rate limit: 10 AI swaps per day per user
+    const rl = checkDailyRateLimit(user.id, "exercise-swap", 10);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: `Daily exercise swap limit reached (10/day). Resets in ${Math.ceil(rl.resetInSeconds / 3600)} hours.` },
+        { status: 429, headers: { "Retry-After": String(rl.resetInSeconds) } }
+      );
+    }
+
     const body = await request.json();
     const { dailyPlanExerciseId, reason } = body;
 
