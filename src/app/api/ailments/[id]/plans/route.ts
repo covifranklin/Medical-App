@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError, verifyAilmentOwnership } from "@/lib/user";
 import type { ExerciseFrequency } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const EXERCISE_FREQUENCIES: ExerciseFrequency[] = [
   "DAILY", "ALTERNATE_DAYS", "WEEKLY", "AS_NEEDED",
 ];

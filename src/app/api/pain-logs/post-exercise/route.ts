@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/pain-logs/post-exercise — save post-exercise pain assessments
 export async function POST(request: NextRequest) {
   try {

@@ -7,6 +7,8 @@ import { checkDailyRateLimit } from "@/lib/rate-limit";
 import type { Prisma } from "@prisma/client";
 import type { PlanReviewResult } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 function isValidUUID(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 }

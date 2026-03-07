@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError, verifyExerciseOwnership } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const BODY_REGIONS: BodyRegion[] = [
   "HEAD", "NECK", "LEFT_SHOULDER", "RIGHT_SHOULDER", "UPPER_BACK",
   "LOWER_BACK", "CHEST", "LEFT_ARM", "RIGHT_ARM", "LEFT_HAND",

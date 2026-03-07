@@ -11,6 +11,8 @@ import type { DailyPlanContext } from "@/lib/prompts/daily-routine";
 import type { GeneratedDailyPlan } from "@/types";
 import type { BodyRegion } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const MODEL_ID = "claude-sonnet-4-5-20241022";
 
 const DAYS = [
