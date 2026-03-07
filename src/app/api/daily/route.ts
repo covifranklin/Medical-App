@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { BodyRegion } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 function getToday(): Date {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());

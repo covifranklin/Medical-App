@@ -4,6 +4,8 @@ import { getCurrentUser, handleApiError } from "@/lib/user";
 import { anthropic } from "@/lib/ai";
 import { checkDailyRateLimit } from "@/lib/rate-limit";
 
+export const dynamic = "force-dynamic";
+
 const MODEL_ID = "claude-sonnet-4-5-20241022";
 
 const REGION_LABELS: Record<string, string> = {

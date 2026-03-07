@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 
+export const dynamic = "force-dynamic";
+
 // PATCH /api/daily-plan/exercises/[id] — toggle exercise completion
 export async function PATCH(
   request: NextRequest,

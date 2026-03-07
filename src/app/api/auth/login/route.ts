@@ -7,6 +7,8 @@ import {
 } from "@/lib/auth";
 import { checkRateLimit, rateLimitKey } from "@/lib/rate-limit";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   // Rate limit: 5 login attempts per minute per IP
   const rl = checkRateLimit(rateLimitKey(request), {

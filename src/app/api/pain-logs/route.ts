@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/pain-logs?date=2026-02-23&ailmentId=xxx
 export async function GET(request: NextRequest) {
   try {

@@ -4,6 +4,8 @@ import { getCurrentUser, handleApiError } from "@/lib/user";
 import type { AilmentWithPain, RegionData } from "@/types";
 import type { BodyRegion } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/body-map — fetch current user's ailments grouped by body region
 export async function GET() {
   try {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/plans — list all treatment plans (stub — use /api/ailments/[id]/plans instead)
 export async function GET() {
   try {
