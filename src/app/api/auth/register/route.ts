@@ -84,10 +84,12 @@ export async function POST(request: Request) {
     return NextResponse.json({
       user: { id: user.id, email: user.email, name: user.name },
     });
-  } catch {
-    return NextResponse.json(
-      { error: "Registration failed. Please try again." },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("Registration error:", error);
+    const message =
+      error instanceof Error && error.message.includes("Session")
+        ? "Database not fully migrated. Run: npx prisma migrate deploy"
+        : "Registration failed. Please try again.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
