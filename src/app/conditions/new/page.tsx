@@ -28,21 +28,21 @@ function NewAilmentContent() {
       <div className="mb-6">
         <Link
           href="/conditions"
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="text-sm text-warm-500 hover:text-warm-700"
         >
           &larr; Back to Ailments
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">
+        <h1 className="mt-2 text-2xl font-bold text-warm-900">
           Add New Ailment
         </h1>
         {regionParam && VALID_REGIONS.includes(regionParam) && (
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-warm-600">
             Adding ailment for the selected body region.
           </p>
         )}
       </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
         <AilmentForm initialData={initialData} />
       </div>
     </div>
@@ -53,7 +53,7 @@ export default function NewAilmentPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-12 text-center text-sm text-gray-500">
+        <div className="py-12 text-center text-sm text-warm-500">
           Loading...
         </div>
       }

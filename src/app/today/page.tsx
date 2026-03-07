@@ -58,8 +58,8 @@ const REGION_LABELS: Record<string, string> = {
 const REGION_COLOURS: Record<string, string> = {
   HEAD: "bg-purple-100 text-purple-800",
   NECK: "bg-purple-100 text-purple-800",
-  LEFT_SHOULDER: "bg-blue-100 text-blue-800",
-  RIGHT_SHOULDER: "bg-blue-100 text-blue-800",
+  LEFT_SHOULDER: "bg-sage-100 text-sage-700",
+  RIGHT_SHOULDER: "bg-sage-100 text-sage-700",
   UPPER_BACK: "bg-indigo-100 text-indigo-800",
   LOWER_BACK: "bg-indigo-100 text-indigo-800",
   CHEST: "bg-pink-100 text-pink-800",
@@ -123,9 +123,9 @@ function ExerciseTimer({ seconds }: { seconds: number }) {
   const pct = seconds > 0 ? ((seconds - remaining) / seconds) * 100 : 0;
 
   return (
-    <div className="mt-2 rounded-md bg-gray-50 p-3">
+    <div className="mt-2 rounded-xl bg-warm-50 p-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-lg font-mono font-semibold text-gray-900">
+        <span className="text-lg font-mono font-semibold text-warm-900">
           {mins}:{secs.toString().padStart(2, "0")}
         </span>
         <div className="flex gap-1.5">
@@ -147,15 +147,15 @@ function ExerciseTimer({ seconds }: { seconds: number }) {
           )}
           <button
             onClick={reset}
-            className="rounded border border-gray-300 bg-white px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
+            className="rounded border border-warm-300 bg-white px-4 py-2 md:px-3 md:py-1 text-xs font-medium text-warm-600 hover:bg-warm-50"
           >
             Reset
           </button>
         </div>
       </div>
-      <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-warm-200 overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-1000 ${remaining === 0 ? "bg-green-500" : "bg-blue-500"}`}
+          className={`h-full rounded-full transition-all duration-1000 ${remaining === 0 ? "bg-green-500" : "bg-sage-500"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -466,27 +466,27 @@ export default function TodayPage() {
   if (hasPainLog === false) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-warm-900">
           Today&apos;s Routine
         </h1>
-        <div className="mt-8 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50 p-8 text-center">
-          <h2 className="text-lg font-semibold text-blue-900">
+        <div className="mt-8 rounded-2xl border-2 border-dashed border-sage-200 bg-sage-50 p-8 text-center">
+          <h2 className="text-lg font-semibold text-sage-800">
             Start with your check-in
           </h2>
-          <p className="mt-2 text-sm text-blue-700">
+          <p className="mt-2 text-sm text-sage-700">
             Log today&apos;s pain levels before generating your exercise plan.
             This helps the AI prioritise exercises for how you&apos;re feeling
             today.
           </p>
           <Link
             href="/check-in"
-            className="mt-4 inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+            className="mt-4 inline-flex items-center rounded-xl bg-sage-600 px-5 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-sage-700"
           >
             Do Check-in
           </Link>
           <button
             onClick={() => setHasPainLog(true)}
-            className="mt-3 block mx-auto text-xs text-blue-500 hover:text-blue-700"
+            className="mt-3 block mx-auto text-xs text-sage-500 hover:text-sage-700"
           >
             Skip check-in and generate plan anyway
           </button>
@@ -499,29 +499,29 @@ export default function TodayPage() {
   if (!plan) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-warm-900">
           Today&apos;s Routine
         </h1>
-        <p className="mt-1 text-sm text-gray-500">{today}</p>
+        <p className="mt-1 text-sm text-warm-500">{today}</p>
 
         {error && (
-          <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
 
-        <div className="mt-8 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-          <h2 className="text-lg font-semibold text-gray-700">
+        <div className="mt-8 rounded-2xl border-2 border-dashed border-warm-300 p-12 text-center">
+          <h2 className="text-lg font-semibold text-warm-700">
             No plan for today yet
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-warm-500">
             Generate a personalised exercise plan based on your ailments, pain
             levels, and treatment plans.
           </p>
           <button
             onClick={() => handleGenerate()}
             disabled={generating}
-            className="mt-5 inline-flex items-center rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+            className="mt-5 inline-flex items-center rounded-xl bg-sage-600 px-6 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-sage-700 disabled:opacity-50"
           >
             {generating ? "Generating..." : "Generate Today's Plan"}
           </button>
@@ -544,31 +544,31 @@ export default function TodayPage() {
   if (view === "summary" && plan) {
     return (
       <div className="pb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Session Summary</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-warm-900">Session Summary</h1>
+        <p className="mt-1 text-sm text-warm-500">
           Great work! Rate how each area feels after exercising.
         </p>
 
         {/* Stats bar */}
         <div className="mt-5 grid grid-cols-3 gap-3">
-          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="rounded-2xl border border-warm-200 bg-white p-3 text-center">
+            <p className="text-2xl font-bold text-sage-600">
               {completedExercises.length}
-              <span className="text-sm font-normal text-gray-400">
+              <span className="text-sm font-normal text-warm-400">
                 /{plan.exercises.length}
               </span>
             </p>
-            <p className="mt-1 text-xs text-gray-500">Exercises</p>
+            <p className="mt-1 text-xs text-warm-500">Exercises</p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
+          <div className="rounded-2xl border border-warm-200 bg-white p-3 text-center">
             <p className="text-2xl font-bold text-green-600">{totalTimeMin}</p>
-            <p className="mt-1 text-xs text-gray-500">Minutes</p>
+            <p className="mt-1 text-xs text-warm-500">Minutes</p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-3 text-center">
+          <div className="rounded-2xl border border-warm-200 bg-white p-3 text-center">
             <p className="text-2xl font-bold text-purple-600">
               {regionsWorked.length}
             </p>
-            <p className="mt-1 text-xs text-gray-500">Regions</p>
+            <p className="mt-1 text-xs text-warm-500">Regions</p>
           </div>
         </div>
 
@@ -577,7 +577,7 @@ export default function TodayPage() {
           {regionsWorked.map((r) => (
             <span
               key={r}
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-gray-100 text-gray-800"}`}
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-warm-100 text-warm-800"}`}
             >
               {REGION_LABELS[r] ?? r}
             </span>
@@ -586,10 +586,10 @@ export default function TodayPage() {
 
         {/* Pain re-assessment */}
         <div className="mt-6">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-semibold text-warm-900">
             Post-Exercise Pain Check
           </h2>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-warm-500">
             How does each area feel now? This before/after data helps improve
             future plans.
           </p>
@@ -597,20 +597,20 @@ export default function TodayPage() {
             {painAssessments.map((pa, idx) => (
               <div
                 key={pa.ailmentName}
-                className="rounded-lg border border-gray-200 bg-white p-4"
+                className="rounded-2xl border border-warm-200 bg-white p-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[pa.bodyRegion] ?? "bg-gray-100 text-gray-800"}`}
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[pa.bodyRegion] ?? "bg-warm-100 text-warm-800"}`}
                   >
                     {REGION_LABELS[pa.bodyRegion] ?? pa.bodyRegion}
                   </span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-warm-900">
                     {pa.ailmentName}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-400 w-6">1</span>
+                  <span className="text-xs text-warm-400 w-6">1</span>
                   <input
                     type="range"
                     min={1}
@@ -624,9 +624,9 @@ export default function TodayPage() {
                         )
                       );
                     }}
-                    className="flex-1 accent-blue-600"
+                    className="flex-1 accent-sage-600"
                   />
-                  <span className="text-xs text-gray-400 w-6">10</span>
+                  <span className="text-xs text-warm-400 w-6">10</span>
                   <span
                     className={`w-8 text-center text-sm font-bold ${
                       pa.painLevel <= 3
@@ -651,7 +651,7 @@ export default function TodayPage() {
                       )
                     );
                   }}
-                  className="mt-2 w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 placeholder-gray-400"
+                  className="mt-2 w-full rounded-xl border border-warm-200 px-3 py-1.5 text-sm text-warm-700 placeholder-warm-400"
                 />
               </div>
             ))}
@@ -659,7 +659,7 @@ export default function TodayPage() {
         </div>
 
         {error && (
-          <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -668,13 +668,13 @@ export default function TodayPage() {
           <button
             onClick={handleSaveAssessment}
             disabled={savingAssessment}
-            className="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+            className="inline-flex items-center rounded-xl bg-sage-600 px-5 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-sage-700 disabled:opacity-50"
           >
             {savingAssessment ? "Saving..." : "Save Assessment"}
           </button>
           <button
             onClick={() => setView("routine")}
-            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm font-medium text-warm-700 hover:bg-warm-50"
           >
             Back to Routine
           </button>
@@ -703,10 +703,10 @@ export default function TodayPage() {
               />
             </svg>
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+          <h1 className="mt-4 text-2xl font-bold text-warm-900">
             Session Complete!
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-warm-500">
             {completedExercises.length} exercises &middot; ~{totalTimeMin} min
             &middot; {regionsWorked.length} region
             {regionsWorked.length !== 1 ? "s" : ""}
@@ -715,7 +715,7 @@ export default function TodayPage() {
 
         {comparison.length > 0 && (
           <div className="mt-8">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3">
+            <h2 className="text-sm font-semibold text-warm-700 mb-3">
               Pain: Before vs After
             </h2>
             <div className="space-y-2">
@@ -732,30 +732,30 @@ export default function TodayPage() {
                     ? "text-green-600"
                     : change > 0
                       ? "text-red-600"
-                      : "text-gray-500";
+                      : "text-warm-500";
                 return (
                   <div
                     key={c.ailmentId}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3"
+                    className="flex items-center justify-between rounded-2xl border border-warm-200 bg-white px-4 py-3"
                   >
                     <div className="flex items-center gap-2">
                       {c.bodyRegion && (
                         <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[c.bodyRegion] ?? "bg-gray-100 text-gray-800"}`}
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${REGION_COLOURS[c.bodyRegion] ?? "bg-warm-100 text-warm-800"}`}
                         >
                           {REGION_LABELS[c.bodyRegion] ?? c.bodyRegion}
                         </span>
                       )}
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-warm-900">
                         {c.ailmentName}
                       </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <span className="text-gray-500">
+                      <span className="text-warm-500">
                         {c.prePainLevel ?? "—"}
                       </span>
-                      <span className="text-gray-300">&rarr;</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-warm-300">&rarr;</span>
+                      <span className="font-medium text-warm-900">
                         {c.postPainLevel ?? "—"}
                       </span>
                       <span className={`text-xs font-medium ${changeColour}`}>
@@ -770,14 +770,14 @@ export default function TodayPage() {
         )}
 
         <div className="mt-6">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">
+          <h2 className="text-sm font-semibold text-warm-700 mb-2">
             Regions Worked
           </h2>
           <div className="flex flex-wrap gap-1.5">
             {regionsWorked.map((r) => (
               <span
                 key={r}
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-gray-100 text-gray-800"}`}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${REGION_COLOURS[r] ?? "bg-warm-100 text-warm-800"}`}
               >
                 {REGION_LABELS[r] ?? r}
               </span>
@@ -788,13 +788,13 @@ export default function TodayPage() {
         <div className="mt-8 flex gap-3 justify-center">
           <Link
             href="/"
-            className="inline-flex items-center rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+            className="inline-flex items-center rounded-xl bg-sage-600 px-5 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-sage-700"
           >
             Back to Dashboard
           </Link>
           <button
             onClick={() => setView("routine")}
-            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-2.5 text-sm font-medium text-warm-700 hover:bg-warm-50"
           >
             View Routine
           </button>
@@ -809,17 +809,17 @@ export default function TodayPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-2 md:gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+          <h1 className="text-xl md:text-2xl font-bold text-warm-900">
             Today&apos;s Routine
           </h1>
-          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-warm-500">
             {today} — {plan.totalMinutes} min plan —{" "}
             {plan.source === "AI" ? "AI-generated" : "Manual"}
           </p>
         </div>
         <button
           onClick={() => setShowRegenerate(!showRegenerate)}
-          className="shrink-0 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="shrink-0 inline-flex items-center rounded-xl border border-warm-300 bg-white px-3 py-1.5 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50"
         >
           Regenerate
         </button>
@@ -827,16 +827,16 @@ export default function TodayPage() {
 
       {/* Regenerate panel (feature 7) */}
       {showRegenerate && (
-        <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-900">
+        <div className="mt-3 rounded-2xl border border-warm-200 bg-white p-4 shadow-soft">
+          <h3 className="text-sm font-semibold text-warm-900">
             Regenerate Plan
           </h3>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-warm-500">
             This will replace your current plan. Completion progress will be
             lost.
           </p>
           <div className="mt-3 flex items-center gap-3">
-            <label className="text-sm text-gray-600">Time budget:</label>
+            <label className="text-sm text-warm-600">Time budget:</label>
             <input
               type="range"
               min={10}
@@ -844,9 +844,9 @@ export default function TodayPage() {
               step={5}
               value={regenTimeBudget}
               onChange={(e) => setRegenTimeBudget(Number(e.target.value))}
-              className="w-40 accent-blue-600"
+              className="w-40 accent-sage-600"
             />
-            <span className="text-sm font-medium text-gray-900 w-12">
+            <span className="text-sm font-medium text-warm-900 w-12">
               {regenTimeBudget}m
             </span>
           </div>
@@ -854,13 +854,13 @@ export default function TodayPage() {
             <button
               onClick={() => handleGenerate(true)}
               disabled={generating}
-              className="inline-flex items-center rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-sage-700 disabled:opacity-50"
             >
               {generating ? "Generating..." : "Regenerate"}
             </button>
             <button
               onClick={() => setShowRegenerate(false)}
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-1.5 text-sm font-medium text-warm-700 hover:bg-warm-50"
             >
               Cancel
             </button>
@@ -869,7 +869,7 @@ export default function TodayPage() {
       )}
 
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
           <button
             onClick={() => setError(null)}
@@ -883,17 +883,17 @@ export default function TodayPage() {
       {/* Progress bar (feature 5) */}
       <div className="mt-5">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-warm-700">
             Progress: {completedCount}/{totalCount} exercises
           </span>
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-warm-700">
             {Math.round(progressPct)}%
           </span>
         </div>
-        <div className="h-3 rounded-full bg-gray-200 overflow-hidden">
+        <div className="h-3 rounded-full bg-warm-200 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
-              progressPct === 100 ? "bg-green-500" : "bg-blue-500"
+              progressPct === 100 ? "bg-green-500" : "bg-sage-500"
             }`}
             style={{ width: `${progressPct}%` }}
           />
@@ -906,10 +906,10 @@ export default function TodayPage() {
         {completedCount > 0 && (
           <button
             onClick={handleFinishRoutine}
-            className={`mt-3 w-full rounded-md py-2.5 text-sm font-medium shadow-sm ${
+            className={`mt-3 w-full rounded-xl py-2.5 text-sm font-medium shadow-soft ${
               progressPct === 100
                 ? "bg-green-600 text-white hover:bg-green-700"
-                : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                : "border border-warm-300 bg-white text-warm-700 hover:bg-warm-50"
             }`}
           >
             {progressPct === 100
@@ -921,7 +921,7 @@ export default function TodayPage() {
 
       {/* Warm-up note */}
       {warmUpText && (
-        <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4">
+        <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 p-4">
           <p className="text-sm text-green-800">{warmUpText.replace(/^\*\*Warm-up \(2-3 min\):\*\*\s*/, "")}</p>
           <span className="mt-1 block text-xs text-green-600">Warm-up (2-3 min)</span>
         </div>
@@ -929,7 +929,7 @@ export default function TodayPage() {
 
       {/* General notes */}
       {generalNotes && (
-        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+        <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3">
           <p className="text-sm text-amber-800">{generalNotes}</p>
         </div>
       )}
@@ -949,16 +949,16 @@ export default function TodayPage() {
 
       {/* Cool-down note */}
       {coolDownText && (
-        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <p className="text-sm text-blue-800">{coolDownText.replace(/^\*\*Cool-down \(2 min\):\*\*\s*/, "")}</p>
-          <span className="mt-1 block text-xs text-blue-600">Cool-down (2 min)</span>
+        <div className="mt-4 rounded-2xl border border-sage-200 bg-sage-50 p-4">
+          <p className="text-sm text-sage-700">{coolDownText.replace(/^\*\*Cool-down \(2 min\):\*\*\s*/, "")}</p>
+          <span className="mt-1 block text-xs text-sage-600">Cool-down (2 min)</span>
         </div>
       )}
 
       {/* Deprioritised section (feature 6) */}
       {deprioritisedText && (
-        <div className="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">
+        <div className="mt-6 rounded-2xl border border-warm-200 bg-warm-50 p-4">
+          <h3 className="text-sm font-semibold text-warm-700 mb-2">
             Deprioritised Today
           </h3>
           <div className="space-y-1">
@@ -966,7 +966,7 @@ export default function TodayPage() {
               .replace(/^\*\*Deprioritised today:\*\*\s*/, "")
               .split("; ")
               .map((item, i) => (
-                <p key={i} className="text-sm text-gray-600">
+                <p key={i} className="text-sm text-warm-600">
                   &bull; {item}
                 </p>
               ))}
@@ -993,7 +993,7 @@ function ExerciseCard({
   const [showSwapMenu, setShowSwapMenu] = useState(false);
   const ex = pe.exercise;
   const regionLabel = REGION_LABELS[ex.targetBodyRegion] ?? ex.targetBodyRegion;
-  const regionColour = REGION_COLOURS[ex.targetBodyRegion] ?? "bg-gray-100 text-gray-800";
+  const regionColour = REGION_COLOURS[ex.targetBodyRegion] ?? "bg-warm-100 text-warm-800";
 
   // Build detail string
   const details: string[] = [];
@@ -1010,10 +1010,10 @@ function ExerciseCard({
 
   return (
     <div
-      className={`rounded-lg border bg-white shadow-sm transition-all ${
+      className={`rounded-2xl border bg-white shadow-soft transition-all ${
         pe.completed
           ? "border-green-200 bg-green-50/50 opacity-80"
-          : "border-gray-200"
+          : "border-warm-200"
       }`}
     >
       <div className="p-4">
@@ -1024,7 +1024,7 @@ function ExerciseCard({
             className={`mt-0.5 flex h-7 w-7 md:h-5 md:w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
               pe.completed
                 ? "border-green-500 bg-green-500 text-white"
-                : "border-gray-300 hover:border-blue-400"
+                : "border-warm-300 hover:border-sage-400"
             }`}
           >
             {pe.completed && (
@@ -1044,7 +1044,7 @@ function ExerciseCard({
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 className={`text-sm font-semibold ${
-                  pe.completed ? "text-gray-500 line-through" : "text-gray-900"
+                  pe.completed ? "text-warm-500 line-through" : "text-warm-900"
                 }`}
               >
                 {ex.name}
@@ -1054,26 +1054,26 @@ function ExerciseCard({
               >
                 {regionLabel}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-warm-400">
                 for {ex.ailmentName}
               </span>
             </div>
 
             {/* Details */}
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-warm-500">
               {details.join(" · ")}
             </p>
 
             {/* Description/instructions */}
             {ex.description && (
-              <p className="mt-1.5 text-sm text-gray-600">
+              <p className="mt-1.5 text-sm text-warm-600">
                 {ex.description}
               </p>
             )}
 
             {/* Reason for inclusion */}
             {pe.reason && (
-              <p className="mt-1 text-xs text-gray-400 italic">
+              <p className="mt-1 text-xs text-warm-400 italic">
                 {pe.reason}
               </p>
             )}
@@ -1091,7 +1091,7 @@ function ExerciseCard({
             <button
               onClick={() => setShowSwapMenu(!showSwapMenu)}
               disabled={swapping}
-              className="inline-flex items-center rounded border border-gray-200 bg-white px-3 py-2 md:px-2.5 md:py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50"
+              className="inline-flex items-center rounded border border-warm-200 bg-white px-3 py-2 md:px-2.5 md:py-1 text-xs font-medium text-warm-600 hover:bg-warm-50 active:bg-warm-100 disabled:opacity-50"
             >
               {swapping ? "Swapping..." : "This hurts / Swap"}
             </button>
@@ -1100,8 +1100,8 @@ function ExerciseCard({
 
         {/* Swap reason menu */}
         {showSwapMenu && !pe.completed && (
-          <div className="mt-2 ml-8 rounded-md border border-gray-200 bg-gray-50 p-3">
-            <p className="text-xs font-medium text-gray-700 mb-2">
+          <div className="mt-2 ml-8 rounded-xl border border-warm-200 bg-warm-50 p-3">
+            <p className="text-xs font-medium text-warm-700 mb-2">
               Why do you need to swap?
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -1119,7 +1119,7 @@ function ExerciseCard({
                     onSwap(reason);
                   }}
                   disabled={swapping}
-                  className="rounded-full border border-gray-200 bg-white px-3.5 py-2 md:px-3 md:py-1 text-xs text-gray-700 hover:bg-blue-50 hover:border-blue-300 active:bg-blue-100 disabled:opacity-50"
+                  className="rounded-full border border-warm-200 bg-white px-3.5 py-2 md:px-3 md:py-1 text-xs text-warm-700 hover:bg-sage-50 hover:border-sage-300 active:bg-sage-100 disabled:opacity-50"
                 >
                   {reason}
                 </button>

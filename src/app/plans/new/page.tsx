@@ -44,22 +44,22 @@ function NewPlanContent() {
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-sm text-gray-500">Loading...</div>
+      <div className="py-12 text-center text-sm text-warm-500">Loading...</div>
     );
   }
 
   if (ailments.length === 0) {
     return (
       <div>
-        <Link href="/conditions" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/conditions" className="text-sm text-warm-500 hover:text-warm-700">
           &larr; Back to Ailments
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Add Treatment Plan</h1>
-        <div className="mt-6 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center text-gray-500">
+        <h1 className="mt-2 text-2xl font-bold text-warm-900">Add Treatment Plan</h1>
+        <div className="mt-6 rounded-2xl border-2 border-dashed border-warm-300 p-12 text-center text-warm-500">
           <p>You need at least one ailment before creating a treatment plan.</p>
           <Link
             href="/conditions/new"
-            className="mt-3 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="mt-3 inline-block text-sm font-medium text-sage-600 hover:text-sage-700"
           >
             + Add your first ailment
           </Link>
@@ -73,13 +73,13 @@ function NewPlanContent() {
       <div className="mb-6">
         <Link
           href={ailmentIdParam ? `/conditions/${ailmentIdParam}` : "/conditions"}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="text-sm text-warm-500 hover:text-warm-700"
         >
           &larr; {selectedAilment ? `Back to ${selectedAilment.name}` : "Back to Ailments"}
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Add Treatment Plan</h1>
+        <h1 className="mt-2 text-2xl font-bold text-warm-900">Add Treatment Plan</h1>
         {selectedAilment && (
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-warm-600">
             Adding plan for {selectedAilment.name}
           </p>
         )}
@@ -88,14 +88,14 @@ function NewPlanContent() {
       {/* Ailment picker — shown only if no ailmentId was pre-selected */}
       {!ailmentIdParam && (
         <div className="mb-4">
-          <label htmlFor="ailmentPicker" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="ailmentPicker" className="block text-sm font-medium text-warm-700">
             Ailment <span className="text-red-500">*</span>
           </label>
           <select
             id="ailmentPicker"
             value={ailmentId}
             onChange={(e) => setAilmentId(e.target.value)}
-            className="mt-1 block w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full max-w-md rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {ailments.map((a) => (
               <option key={a.id} value={a.id}>
@@ -106,7 +106,7 @@ function NewPlanContent() {
         </div>
       )}
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
         <PlanForm ailmentId={ailmentId} />
       </div>
     </div>
@@ -117,7 +117,7 @@ export default function NewPlanPage() {
   return (
     <Suspense
       fallback={
-        <div className="py-12 text-center text-sm text-gray-500">
+        <div className="py-12 text-center text-sm text-warm-500">
           Loading...
         </div>
       }

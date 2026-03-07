@@ -238,7 +238,7 @@ export default function CheckInPage() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-warm-900">Daily Check-in</h1>
         <div className="mt-6">
           <SkeletonCheckIn />
         </div>
@@ -250,7 +250,7 @@ export default function CheckInPage() {
     return (
       <div className="py-20 text-center">
         <div className="text-3xl mb-3">Logged</div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-warm-600">
           Pain levels saved for {today}. Redirecting to body map...
         </p>
       </div>
@@ -260,9 +260,9 @@ export default function CheckInPage() {
   if (ailments.length === 0) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Daily Check-in</h1>
-        <div className="mt-8 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-          <p className="text-gray-500">
+        <h1 className="text-2xl font-bold text-warm-900">Daily Check-in</h1>
+        <div className="mt-8 rounded-2xl border-2 border-dashed border-warm-300 p-12 text-center">
+          <p className="text-warm-500">
             No active ailments to log. Add ailments first from the Body Map or
             Ailments page.
           </p>
@@ -276,8 +276,8 @@ export default function CheckInPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Daily Check-in</h1>
-          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-600">
+          <h1 className="text-xl md:text-2xl font-bold text-warm-900">Daily Check-in</h1>
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-warm-600">
             {today} — {ailments.length} active ailment
             {ailments.length !== 1 ? "s" : ""}
             {todayAlreadyLogged && (
@@ -292,7 +292,7 @@ export default function CheckInPage() {
         <button
           onClick={handleNormalDay}
           disabled={submitting}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3 md:py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 w-full sm:w-auto"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-5 py-3 md:py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 w-full sm:w-auto"
         >
           Normal Day
           <span className="text-xs font-normal opacity-80">
@@ -302,7 +302,7 @@ export default function CheckInPage() {
       </div>
 
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -311,7 +311,7 @@ export default function CheckInPage() {
       <div className="mt-6 space-y-6">
         {Object.entries(grouped).map(([region, regionAilments]) => (
           <div key={region}>
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-warm-400 mb-2">
               {REGION_LABELS[region] ?? region}
             </h2>
             <div className="space-y-3">
@@ -321,12 +321,12 @@ export default function CheckInPage() {
                 return (
                   <div
                     key={ailment.id}
-                    className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+                    className="rounded-2xl border border-warm-200 bg-white p-4 shadow-soft"
                   >
                     {/* Ailment name + severity badge */}
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-warm-900">
                           {ailment.name}
                         </span>
                         <span
@@ -336,7 +336,7 @@ export default function CheckInPage() {
                         </span>
                       </div>
                       {ailment.latestPainLog && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-warm-400">
                           Last: {ailment.latestPainLog.painLevel}/10 ({ailment.latestPainLog.date})
                         </span>
                       )}
@@ -352,7 +352,7 @@ export default function CheckInPage() {
                         onChange={(e) =>
                           updatePainLevel(ailment.id, Number(e.target.value))
                         }
-                        className="flex-1 h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 touch-manipulation"
+                        className="flex-1 h-2 rounded-2xl appearance-none cursor-pointer accent-sage-600 touch-manipulation"
                       />
                       <div className="flex items-center gap-2 shrink-0">
                         <span
@@ -360,7 +360,7 @@ export default function CheckInPage() {
                         >
                           {entry.painLevel}
                         </span>
-                        <span className="text-xs text-gray-500 w-16">
+                        <span className="text-xs text-warm-500 w-16">
                           {painLabel(entry.painLevel)}
                         </span>
                       </div>
@@ -368,9 +368,9 @@ export default function CheckInPage() {
 
                     {/* Scale labels */}
                     <div className="flex justify-between mt-1 px-0.5">
-                      <span className="text-[10px] text-gray-300">1</span>
-                      <span className="text-[10px] text-gray-300">5</span>
-                      <span className="text-[10px] text-gray-300">10</span>
+                      <span className="text-[10px] text-warm-300">1</span>
+                      <span className="text-[10px] text-warm-300">5</span>
+                      <span className="text-[10px] text-warm-300">10</span>
                     </div>
 
                     {/* Notes toggle + field */}
@@ -378,7 +378,7 @@ export default function CheckInPage() {
                       <button
                         type="button"
                         onClick={() => toggleExpanded(ailment.id)}
-                        className="text-xs text-gray-400 hover:text-gray-600"
+                        className="text-xs text-warm-400 hover:text-warm-600"
                       >
                         {entry.expanded ? "Hide notes" : "+ Add notes"}
                       </button>
@@ -391,7 +391,7 @@ export default function CheckInPage() {
                             updateNotes(ailment.id, e.target.value)
                           }
                           placeholder="Anything unusual? Triggers, time of day..."
-                          className="mt-1 block w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="mt-1 block w-full rounded-xl border border-warm-200 px-3 py-1.5 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
                         />
                       )}
                     </div>
@@ -408,13 +408,13 @@ export default function CheckInPage() {
         <button
           onClick={() => handleSubmit(false)}
           disabled={submitting}
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 md:py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-xl bg-sage-600 px-6 py-3 md:py-2.5 text-sm font-medium text-white shadow-soft hover:bg-sage-700 active:bg-sage-800 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2 disabled:opacity-50"
         >
           {submitting ? "Saving..." : "Save Check-in"}
         </button>
         <button
           onClick={() => router.push("/")}
-          className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 md:py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center justify-center rounded-xl border border-warm-300 bg-white px-4 py-3 md:py-2.5 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50"
         >
           Cancel
         </button>

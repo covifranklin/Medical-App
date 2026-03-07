@@ -113,7 +113,7 @@ export default function PlanForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {errors.length > 0 && (
-        <div className="rounded-md bg-red-50 border border-red-200 p-3">
+        <div className="rounded-xl bg-red-50 border border-red-200 p-3">
           <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
             {errors.map((err, i) => (
               <li key={i}>{err}</li>
@@ -124,7 +124,7 @@ export default function PlanForm({
 
       {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="title" className="block text-sm font-medium text-warm-700">
           Plan Title <span className="text-red-500">*</span>
         </label>
         <input
@@ -135,14 +135,14 @@ export default function PlanForm({
           value={form.title}
           onChange={(e) => updateField("title", e.target.value)}
           placeholder='e.g. "Physio plan from Dr. Smith"'
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
         />
       </div>
 
       {/* Prescribed By + Frequency row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="prescribedBy" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="prescribedBy" className="block text-sm font-medium text-warm-700">
             Prescribed By
           </label>
           <input
@@ -152,19 +152,19 @@ export default function PlanForm({
             value={form.prescribedBy}
             onChange={(e) => updateField("prescribedBy", e.target.value)}
             placeholder="e.g. Dr. Smith, Physio clinic"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           />
         </div>
 
         <div>
-          <label htmlFor="frequency" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="frequency" className="block text-sm font-medium text-warm-700">
             Frequency
           </label>
           <select
             id="frequency"
             value={form.frequency}
             onChange={(e) => updateField("frequency", e.target.value as ExerciseFrequency)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {FREQUENCY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -177,7 +177,7 @@ export default function PlanForm({
 
       {/* Start Date */}
       <div className="max-w-xs">
-        <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="startDate" className="block text-sm font-medium text-warm-700">
           Start Date
         </label>
         <input
@@ -185,16 +185,16 @@ export default function PlanForm({
           type="date"
           value={form.startDate}
           onChange={(e) => updateField("startDate", e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
         />
       </div>
 
       {/* Plan Content (raw text) */}
       <div>
-        <label htmlFor="rawContent" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="rawContent" className="block text-sm font-medium text-warm-700">
           Plan Details
         </label>
-        <p className="mt-0.5 text-xs text-gray-500">
+        <p className="mt-0.5 text-xs text-warm-500">
           Paste your physio handout, treatment instructions, or exercise list here.
         </p>
         <textarea
@@ -204,9 +204,9 @@ export default function PlanForm({
           value={form.rawContent}
           onChange={(e) => updateField("rawContent", e.target.value)}
           placeholder={"Paste your treatment plan or physio handout here...\n\ne.g.\n1. Bird-dog hold — 3 sets of 10 reps\n2. Cat-cow stretch — 2 minutes\n3. Glute bridge — 3 sets of 12 reps"}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400 font-mono"
         />
-        <p className="mt-1 text-xs text-gray-400">
+        <p className="mt-1 text-xs text-warm-400">
           {form.rawContent.length.toLocaleString()} / 10,000 characters
         </p>
       </div>
@@ -216,7 +216,7 @@ export default function PlanForm({
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting
             ? isEditing
@@ -229,7 +229,7 @@ export default function PlanForm({
         <button
           type="button"
           onClick={onCancel ?? (() => router.push(`/conditions/${ailmentId}`))}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-2 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2"
         >
           Cancel
         </button>

@@ -27,7 +27,7 @@ interface SummaryResponse {
 const TREND_DISPLAY: Record<string, { icon: string; label: string; colour: string }> = {
   up: { icon: "\u2191", label: "Increasing", colour: "text-red-600" },
   down: { icon: "\u2193", label: "Improving", colour: "text-green-600" },
-  stable: { icon: "\u2192", label: "Stable", colour: "text-gray-500" },
+  stable: { icon: "\u2192", label: "Stable", colour: "text-warm-500" },
 };
 
 const SEVERITY_DOT: Record<string, string> = {
@@ -63,9 +63,9 @@ export default function DashboardSummary() {
 
   if (!data || data.ailments.length === 0) {
     return (
-      <div className="mt-8 rounded-lg border-2 border-dashed border-gray-300 p-8 text-center">
+      <div className="mt-8 rounded-2xl border-2 border-dashed border-warm-300 p-8 text-center">
         <svg
-          className="mx-auto h-10 w-10 text-gray-300"
+          className="mx-auto h-10 w-10 text-warm-300"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -77,15 +77,15 @@ export default function DashboardSummary() {
             d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
           />
         </svg>
-        <p className="mt-3 text-sm font-medium text-gray-500">
+        <p className="mt-3 text-sm font-medium text-warm-500">
           No ailments tracked yet
         </p>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-warm-400">
           Click a body region above or add an ailment to start tracking.
         </p>
         <Link
           href="/conditions/new"
-          className="mt-4 inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="mt-4 inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white hover:bg-sage-700"
         >
           Add your first ailment
         </Link>
@@ -97,18 +97,18 @@ export default function DashboardSummary() {
     <div className="mt-8 space-y-6">
       {/* Check-in prompt */}
       {!data.loggedToday && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 flex items-center justify-between">
+        <div className="rounded-2xl border border-sage-200 bg-sage-50 p-4 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-900">
+            <p className="text-sm font-medium text-sage-800">
               No pain log for today yet
             </p>
-            <p className="text-xs text-blue-700 mt-0.5">
+            <p className="text-xs text-sage-700 mt-0.5">
               Quick check-in keeps your pain history accurate.
             </p>
           </div>
           <Link
             href="/check-in"
-            className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+            className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700"
           >
             Check in now
           </Link>
@@ -117,7 +117,7 @@ export default function DashboardSummary() {
 
       {/* Summary cards */}
       <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-400 mb-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-warm-400 mb-3">
           Ailment Summary
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -138,7 +138,7 @@ function AilmentCard({ ailment }: { ailment: AilmentSummaryData }) {
   return (
     <Link
       href={`/conditions/${ailment.id}`}
-      className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-gray-300 hover:shadow transition-all"
+      className="block rounded-2xl border border-warm-200 bg-white p-4 shadow-soft hover:border-warm-300 hover:shadow transition-all"
     >
       {/* Header: name + severity dot */}
       <div className="flex items-center justify-between mb-2">
@@ -146,11 +146,11 @@ function AilmentCard({ ailment }: { ailment: AilmentSummaryData }) {
           <span
             className={`h-2 w-2 rounded-full shrink-0 ${SEVERITY_DOT[ailment.severityLevel]}`}
           />
-          <span className="text-sm font-medium text-gray-900 truncate">
+          <span className="text-sm font-medium text-warm-900 truncate">
             {ailment.name}
           </span>
         </div>
-        <span className="text-[10px] text-gray-400 shrink-0 ml-2">
+        <span className="text-[10px] text-warm-400 shrink-0 ml-2">
           {getRegionLabel(ailment.bodyRegion)}
         </span>
       </div>
@@ -169,7 +169,7 @@ function AilmentCard({ ailment }: { ailment: AilmentSummaryData }) {
               >
                 {painLevel}
               </span>
-              <span className="text-xs text-gray-500">/10</span>
+              <span className="text-xs text-warm-500">/10</span>
               {ailment.todayPainLevel && (
                 <span className="text-[10px] text-green-600 font-medium">
                   today
@@ -177,7 +177,7 @@ function AilmentCard({ ailment }: { ailment: AilmentSummaryData }) {
               )}
             </>
           ) : (
-            <span className="text-xs text-gray-400">No logs</span>
+            <span className="text-xs text-warm-400">No logs</span>
           )}
         </div>
 
@@ -192,8 +192,8 @@ function AilmentCard({ ailment }: { ailment: AilmentSummaryData }) {
 
       {/* 7-day activity bar */}
       <div className="mt-2 flex items-center gap-1">
-        <span className="text-[10px] text-gray-400">7d:</span>
-        <span className="text-[10px] text-gray-500">
+        <span className="text-[10px] text-warm-400">7d:</span>
+        <span className="text-[10px] text-warm-500">
           {ailment.logCount7d} log{ailment.logCount7d !== 1 ? "s" : ""}
         </span>
       </div>

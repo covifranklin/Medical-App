@@ -55,7 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               role="alert"
-              className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium shadow-lg animate-slide-in ${TOAST_STYLES[t.type]}`}
+              className={`flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium shadow-lg animate-slide-in ${TOAST_STYLES[t.type]}`}
             >
               <span className="shrink-0">{TOAST_ICONS[t.type]}</span>
               <span className="flex-1">{t.message}</span>
@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 const TOAST_STYLES: Record<ToastType, string> = {
   success: "bg-green-600 text-white",
   error: "bg-red-600 text-white",
-  info: "bg-blue-600 text-white",
+  info: "bg-sage-600 text-white",
 };
 
 const TOAST_ICONS: Record<ToastType, string> = {

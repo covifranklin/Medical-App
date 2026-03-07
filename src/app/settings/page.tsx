@@ -107,7 +107,7 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        <h1 className="text-2xl font-bold text-warm-900">Settings</h1>
         <div className="mt-6 space-y-6">
           <SkeletonCard lines={4} />
           <SkeletonCard lines={5} />
@@ -118,7 +118,7 @@ export default function SettingsPage() {
 
   if (!prefs) {
     return (
-      <div className="rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+      <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
         {error ?? "Failed to load preferences."}
       </div>
     );
@@ -126,23 +126,23 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-      <p className="mt-1 text-sm text-gray-500">
+      <h1 className="text-2xl font-bold text-warm-900">Settings</h1>
+      <p className="mt-1 text-sm text-warm-500">
         Configure your daily exercise routine preferences.
       </p>
 
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* Daily Time Budget */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-900">
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
+        <h2 className="text-sm font-semibold text-warm-900">
           Daily Time Budget
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-warm-500">
           How many minutes can you dedicate to exercises each day? The AI will
           prioritise exercises to fit within this budget.
         </p>
@@ -161,9 +161,9 @@ export default function SettingsPage() {
                   : prev
               )
             }
-            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="flex-1 h-2 bg-warm-200 rounded-2xl appearance-none cursor-pointer accent-sage-600"
           />
-          <span className="text-lg font-semibold text-gray-900 w-16 text-right">
+          <span className="text-lg font-semibold text-warm-900 w-16 text-right">
             {prefs.dailyTimeBudgetMinutes}m
           </span>
         </div>
@@ -180,8 +180,8 @@ export default function SettingsPage() {
               }
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 prefs.dailyTimeBudgetMinutes === mins
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-sage-600 text-white"
+                  : "bg-warm-100 text-warm-700 hover:bg-warm-200"
               }`}
             >
               {mins} min
@@ -191,11 +191,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Weekly Focus Areas */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-900">
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
+        <h2 className="text-sm font-semibold text-warm-900">
           Weekly Focus Areas
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-warm-500">
           Select body regions to prioritise this week. Leave empty to let the AI
           decide based on severity and pain levels.
         </p>
@@ -210,8 +210,8 @@ export default function SettingsPage() {
                 onClick={() => toggleFocusArea(opt.value)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors border ${
                   isSelected
-                    ? "bg-blue-50 border-blue-300 text-blue-700"
-                    : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                    ? "bg-sage-50 border-sage-300 text-sage-700"
+                    : "bg-white border-warm-200 text-warm-600 hover:border-warm-300 hover:bg-warm-50"
                 }`}
               >
                 {opt.label}
@@ -228,7 +228,7 @@ export default function SettingsPage() {
                 prev ? { ...prev, weeklyFocusAreas: [] } : prev
               )
             }
-            className="mt-3 text-xs text-gray-500 hover:text-gray-700 underline"
+            className="mt-3 text-xs text-warm-500 hover:text-warm-700 underline"
           >
             Clear all focus areas
           </button>
@@ -240,7 +240,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+          className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700 disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save Preferences"}
         </button>
