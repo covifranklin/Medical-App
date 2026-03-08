@@ -1,24 +1,39 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 import { getCurrentUser, handleApiError } from "@/lib/user";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/plans — list all treatment plans (stub — use /api/ailments/[id]/plans instead)
+// GET /api/plans — list all treatment plans for the current user
 export async function GET() {
   try {
-    await getCurrentUser();
-    return NextResponse.json({ plans: [] });
+    const user = await getCurrentUser();
+
+    const plans = await prisma.treatmentPlan.findMany({
+      where: { ailment: { userId: user.id } },
+      include: {
+        ailment: {
+          select: { id: true, name: true, bodyRegion: true },
+        },
+        _count: {
+          select: { exercises: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const result = plans.map((plan) => ({
+      id: plan.id,
+      title: plan.title,
+      prescribedBy: plan.prescribedBy,
+      frequency: plan.frequency,
+      startDate: plan.startDate.toISOString().split("T")[0],
+      ailment: plan.ailment,
+      _count: plan._count,
+    }));
+
+    return NextResponse.json(result);
   } catch (error) {
     return handleApiError(error, "fetch plans");
-  }
-}
-
-// POST /api/plans — create a new treatment plan (stub)
-export async function POST() {
-  try {
-    await getCurrentUser();
-    return NextResponse.json({ message: "Not implemented" }, { status: 501 });
-  } catch (error) {
-    return handleApiError(error, "create plan");
   }
 }
