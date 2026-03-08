@@ -26,8 +26,8 @@ const SEVERITY_BADGE: Record<string, string> = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  ACTIVE: "bg-blue-100 text-blue-800",
-  MANAGED: "bg-gray-100 text-gray-700",
+  ACTIVE: "bg-sage-100 text-sage-700",
+  MANAGED: "bg-warm-100 text-warm-700",
   RESOLVED: "bg-green-100 text-green-700",
 };
 
@@ -69,29 +69,29 @@ export default function AilmentsPage() {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ailments</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-warm-900">Ailments</h1>
+          <p className="mt-1 text-sm text-warm-600">
             Manage your ailments and track their severity.
           </p>
         </div>
         <Link
           href="/conditions/new"
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2"
         >
           + Add Ailment
         </Link>
       </div>
 
       {/* Status filter tabs */}
-      <div className="mt-4 flex gap-1 border-b border-gray-200">
+      <div className="mt-4 flex gap-1 border-b border-warm-200">
         {(["ALL", "ACTIVE", "MANAGED", "RESOLVED"] as const).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
             className={`px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
               filter === s
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-sage-400 text-sage-600"
+                : "border-transparent text-warm-500 hover:text-warm-700 hover:border-warm-300"
             }`}
           >
             {s === "ALL" ? "All" : s.charAt(0) + s.slice(1).toLowerCase()}
@@ -104,9 +104,9 @@ export default function AilmentsPage() {
         {loading ? (
           <SkeletonAilmentList count={3} />
         ) : ailments.length === 0 ? (
-          <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+          <div className="rounded-2xl border-2 border-dashed border-warm-300 p-12 text-center">
             <svg
-              className="mx-auto h-10 w-10 text-gray-300"
+              className="mx-auto h-10 w-10 text-warm-300"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -118,19 +118,19 @@ export default function AilmentsPage() {
                 d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
               />
             </svg>
-            <p className="mt-3 text-sm font-medium text-gray-500">
+            <p className="mt-3 text-sm font-medium text-warm-500">
               {filter === "ALL"
                 ? "No ailments recorded yet"
                 : `No ${filter.toLowerCase()} ailments`}
             </p>
             {filter === "ALL" && (
-              <p className="mt-1 text-sm text-gray-400">
+              <p className="mt-1 text-sm text-warm-400">
                 Track your conditions to get personalised exercise plans.
               </p>
             )}
             <Link
               href="/conditions/new"
-              className="mt-4 inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="mt-4 inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white hover:bg-sage-700"
             >
               Add your first ailment
             </Link>
@@ -141,14 +141,14 @@ export default function AilmentsPage() {
               <li key={ailment.id}>
                 <Link
                   href={`/conditions/${ailment.id}`}
-                  className="block rounded-lg border border-gray-200 bg-white p-4 shadow-sm hover:border-gray-300 hover:shadow transition-all"
+                  className="block rounded-2xl border border-warm-200 bg-white p-4 shadow-soft hover:border-warm-300 hover:shadow transition-all"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="text-sm font-semibold text-gray-900 truncate">
+                      <h3 className="text-sm font-semibold text-warm-900 truncate">
                         {ailment.name}
                       </h3>
-                      <p className="mt-0.5 text-xs text-gray-500">
+                      <p className="mt-0.5 text-xs text-warm-500">
                         {REGION_LABELS[ailment.bodyRegion] ?? ailment.bodyRegion}
                         {ailment.diagnosis && ` — ${ailment.diagnosis}`}
                       </p>
@@ -163,7 +163,7 @@ export default function AilmentsPage() {
                     </div>
                   </div>
 
-                  <div className="mt-2 flex items-center gap-4 text-xs text-gray-400">
+                  <div className="mt-2 flex items-center gap-4 text-xs text-warm-400">
                     {ailment.latestPainLog && (
                       <span>
                         Pain: {ailment.latestPainLog.painLevel}/10 ({ailment.latestPainLog.date})

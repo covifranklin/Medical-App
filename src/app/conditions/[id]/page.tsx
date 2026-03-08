@@ -50,15 +50,15 @@ const SEVERITY_BADGE: Record<string, string> = {
 };
 
 const STATUS_BADGE: Record<string, string> = {
-  ACTIVE: "bg-blue-100 text-blue-800",
-  MANAGED: "bg-gray-100 text-gray-700",
+  ACTIVE: "bg-sage-100 text-sage-700",
+  MANAGED: "bg-warm-100 text-warm-700",
   RESOLVED: "bg-green-100 text-green-700",
 };
 
 const PRIORITY_BADGE: Record<string, string> = {
   HIGH: "bg-red-100 text-red-800",
   MEDIUM: "bg-yellow-100 text-yellow-800",
-  LOW: "bg-gray-100 text-gray-600",
+  LOW: "bg-warm-100 text-warm-600",
 };
 
 const GOAL_LABELS: Record<string, string> = {
@@ -145,10 +145,10 @@ export default function AilmentDetailPage({
   if (error || !ailment) {
     return (
       <div>
-        <Link href="/conditions" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/conditions" className="text-sm text-warm-500 hover:text-warm-700">
           &larr; Back to Ailments
         </Link>
-        <div className="mt-6 rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+        <div className="mt-6 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
           {error ?? "Ailment not found."}
         </div>
       </div>
@@ -170,11 +170,11 @@ export default function AilmentDetailPage({
 
     return (
       <div>
-        <Link href="/conditions" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/conditions" className="text-sm text-warm-500 hover:text-warm-700">
           &larr; Back to Ailments
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Edit Ailment</h1>
-        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h1 className="mt-2 text-2xl font-bold text-warm-900">Edit Ailment</h1>
+        <div className="mt-4 rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
           <AilmentForm
             initialData={formData}
             ailmentId={ailment.id}
@@ -192,15 +192,15 @@ export default function AilmentDetailPage({
 
   return (
     <div>
-      <Link href="/conditions" className="text-sm text-gray-500 hover:text-gray-700">
+      <Link href="/conditions" className="text-sm text-warm-500 hover:text-warm-700">
         &larr; Back to Ailments
       </Link>
 
       {/* Header */}
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{ailment.name}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-warm-900">{ailment.name}</h1>
+          <p className="mt-1 text-sm text-warm-500">
             {REGION_LABELS[ailment.bodyRegion] ?? ailment.bodyRegion}
             {ailment.dateDiagnosed && ` — Diagnosed ${ailment.dateDiagnosed}`}
           </p>
@@ -222,13 +222,13 @@ export default function AilmentDetailPage({
       <div className="mt-4 flex gap-2">
         <button
           onClick={() => setEditing(true)}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-3 py-1.5 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50"
         >
           Edit
         </button>
         <button
           onClick={() => setShowDeleteConfirm(true)}
-          className="inline-flex items-center rounded-md border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50"
+          className="inline-flex items-center rounded-xl border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-soft hover:bg-red-50"
         >
           Delete
         </button>
@@ -236,7 +236,7 @@ export default function AilmentDetailPage({
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (
-        <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-4">
+        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-700">
             Delete &ldquo;{ailment.name}&rdquo;? This will also remove all
             linked pain logs and treatment plans. This cannot be undone.
@@ -245,13 +245,13 @@ export default function AilmentDetailPage({
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              className="inline-flex items-center rounded-xl bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
             >
               {deleting ? "Deleting..." : "Yes, delete"}
             </button>
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-3 py-1.5 text-sm font-medium text-warm-700 hover:bg-warm-50"
             >
               Cancel
             </button>
@@ -262,57 +262,57 @@ export default function AilmentDetailPage({
       {/* Detail cards */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Info card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">Details</h2>
+        <div className="rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
+          <h2 className="text-sm font-semibold text-warm-900 mb-3">Details</h2>
           <dl className="space-y-2 text-sm">
             {ailment.diagnosis && (
               <div>
-                <dt className="text-gray-500">Diagnosis</dt>
-                <dd className="text-gray-900">{ailment.diagnosis}</dd>
+                <dt className="text-warm-500">Diagnosis</dt>
+                <dd className="text-warm-900">{ailment.diagnosis}</dd>
               </div>
             )}
             <div>
-              <dt className="text-gray-500">Goal Timeframe</dt>
-              <dd className="text-gray-900">{GOAL_LABELS[ailment.goalTimeframe] ?? ailment.goalTimeframe}</dd>
+              <dt className="text-warm-500">Goal Timeframe</dt>
+              <dd className="text-warm-900">{GOAL_LABELS[ailment.goalTimeframe] ?? ailment.goalTimeframe}</dd>
             </div>
             {ailment.notes && (
               <div>
-                <dt className="text-gray-500">Notes</dt>
-                <dd className="text-gray-900 whitespace-pre-wrap">{ailment.notes}</dd>
+                <dt className="text-warm-500">Notes</dt>
+                <dd className="text-warm-900 whitespace-pre-wrap">{ailment.notes}</dd>
               </div>
             )}
             <div>
-              <dt className="text-gray-500">Created</dt>
-              <dd className="text-gray-900">{new Date(ailment.createdAt).toLocaleDateString()}</dd>
+              <dt className="text-warm-500">Created</dt>
+              <dd className="text-warm-900">{new Date(ailment.createdAt).toLocaleDateString()}</dd>
             </div>
             <div>
-              <dt className="text-gray-500">Last updated</dt>
-              <dd className="text-gray-900">{new Date(ailment.updatedAt).toLocaleDateString()}</dd>
+              <dt className="text-warm-500">Last updated</dt>
+              <dd className="text-warm-900">{new Date(ailment.updatedAt).toLocaleDateString()}</dd>
             </div>
           </dl>
         </div>
 
         {/* Pain logs card */}
-        <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">
+        <div className="rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
+          <h2 className="text-sm font-semibold text-warm-900 mb-3">
             Recent Pain Logs
           </h2>
           {ailment.painLogs.length === 0 ? (
-            <p className="text-sm text-gray-500">No pain logs recorded yet.</p>
+            <p className="text-sm text-warm-500">No pain logs recorded yet.</p>
           ) : (
             <ul className="space-y-2">
               {ailment.painLogs.map((log) => (
                 <li
                   key={log.id}
-                  className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+                  className="flex items-center justify-between rounded-xl bg-warm-50 px-3 py-2"
                 >
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-warm-700">
                     {log.date}
                     {log.notes && (
-                      <span className="ml-2 text-gray-400">— {log.notes}</span>
+                      <span className="ml-2 text-warm-400">— {log.notes}</span>
                     )}
                   </span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-warm-900">
                     {log.painLevel}/10
                   </span>
                 </li>
@@ -323,24 +323,24 @@ export default function AilmentDetailPage({
       </div>
 
       {/* Treatment plans */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900">
+          <h2 className="text-sm font-semibold text-warm-900">
             Treatment Plans
           </h2>
           <Link
             href={`/plans/new?ailmentId=${ailment.id}`}
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700"
+            className="inline-flex items-center rounded-xl bg-sage-600 px-3 py-1.5 text-xs font-medium text-white shadow-soft hover:bg-sage-700"
           >
             + Add Plan
           </Link>
         </div>
         {ailment.treatmentPlans.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-warm-500">
             No treatment plans linked yet.{" "}
             <Link
               href={`/plans/new?ailmentId=${ailment.id}`}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-sage-600 hover:text-sage-700"
             >
               Add your first plan
             </Link>
@@ -350,22 +350,22 @@ export default function AilmentDetailPage({
             {ailment.treatmentPlans.map((plan) => (
               <li
                 key={plan.id}
-                className="flex items-center justify-between rounded-md border border-gray-100 px-3 py-2 hover:border-gray-300 hover:shadow-sm transition-all"
+                className="flex items-center justify-between rounded-xl border border-warm-100 px-3 py-2 hover:border-warm-300 hover:shadow-soft transition-all"
               >
                 <div>
                   <Link
                     href={`/plans/${plan.id}`}
-                    className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                    className="text-sm font-medium text-warm-900 hover:text-sage-600"
                   >
                     {plan.title}
                   </Link>
                   {plan.prescribedBy && (
-                    <span className="ml-2 text-xs text-gray-500">
+                    <span className="ml-2 text-xs text-warm-500">
                       by {plan.prescribedBy}
                     </span>
                   )}
                 </div>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-warm-400">
                   {plan.frequency.toLowerCase()} — since {plan.startDate}
                 </span>
               </li>

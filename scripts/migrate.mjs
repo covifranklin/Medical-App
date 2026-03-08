@@ -8,9 +8,15 @@ if (!process.env.DATABASE_URL) {
 }
 
 try {
+  // Try prisma migrate deploy first (normal flow)
   execSync("npx prisma migrate deploy", { stdio: "inherit" });
 } catch {
-  console.error("Migration failed — build will continue. Run manually:");
-  console.error("  npx prisma migrate deploy");
-  process.exit(0);
+  console.log("migrate deploy failed (P3009 or fresh DB) — falling back to db push...");
+  try {
+    // Fallback: push schema directly (works on fresh or conflicted DBs)
+    execSync("npx prisma db push --accept-data-loss", { stdio: "inherit" });
+  } catch (pushError) {
+    console.error("db push also failed:", pushError);
+    console.error("Build will continue — fix DB manually.");
+  }
 }

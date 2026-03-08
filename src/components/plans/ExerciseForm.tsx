@@ -139,13 +139,13 @@ export default function ExerciseForm({
   }
 
   const inputCls =
-    "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
-  const labelCls = "block text-sm font-medium text-gray-700";
+    "mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400";
+  const labelCls = "block text-sm font-medium text-warm-700";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {errors.length > 0 && (
-        <div className="rounded-md bg-red-50 border border-red-200 p-3">
+        <div className="rounded-xl bg-red-50 border border-red-200 p-3">
           <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
             {errors.map((err, i) => (
               <li key={i}>{err}</li>
@@ -299,7 +299,7 @@ export default function ExerciseForm({
       {/* Video URL */}
       <div>
         <label htmlFor="ex-videoUrl" className={labelCls}>
-          Video URL <span className="text-xs text-gray-400 font-normal">(optional)</span>
+          Video URL <span className="text-xs text-warm-400 font-normal">(optional)</span>
         </label>
         <input
           id="ex-videoUrl"
@@ -317,7 +317,7 @@ export default function ExerciseForm({
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting
             ? isEditing ? "Saving..." : "Adding..."
@@ -327,7 +327,7 @@ export default function ExerciseForm({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-2 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2"
           >
             Cancel
           </button>

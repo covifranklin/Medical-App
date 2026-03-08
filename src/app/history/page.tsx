@@ -136,8 +136,8 @@ export default function HistoryPage() {
       <div>
         <div className="flex items-start justify-between gap-2 md:gap-4 flex-wrap">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">History</h1>
-            <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
+            <h1 className="text-xl md:text-2xl font-bold text-warm-900">History</h1>
+            <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-warm-500">
               Pain trends, exercise tracking, and body insights.
             </p>
           </div>
@@ -152,8 +152,8 @@ export default function HistoryPage() {
   if (error || !data) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">History</h1>
-        <div className="mt-4 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+        <h1 className="text-2xl font-bold text-warm-900">History</h1>
+        <div className="mt-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
           {error ?? "No data available."}
         </div>
       </div>
@@ -174,8 +174,8 @@ export default function HistoryPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-2 md:gap-4 flex-wrap">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">History</h1>
-          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-gray-500">
+          <h1 className="text-xl md:text-2xl font-bold text-warm-900">History</h1>
+          <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-warm-500">
             Pain trends, exercise tracking, and body insights.
           </p>
         </div>
@@ -184,10 +184,10 @@ export default function HistoryPage() {
             <button
               key={r.value}
               onClick={() => setDays(r.value)}
-              className={`rounded-md px-3 py-2 md:py-1.5 text-xs md:text-sm font-medium ${
+              className={`rounded-xl px-3 py-2 md:py-1.5 text-xs md:text-sm font-medium ${
                 days === r.value
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-sage-600 text-white"
+                  : "bg-warm-100 text-warm-600 hover:bg-warm-200"
               }`}
             >
               {r.label}
@@ -200,13 +200,13 @@ export default function HistoryPage() {
       <ErrorBoundary section="Pain Trends">
       <section className="mt-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base md:text-lg font-semibold text-gray-900">
+          <h2 className="text-base md:text-lg font-semibold text-warm-900">
             Pain Trends by Condition
           </h2>
           <select
             value={selectedAilment}
             onChange={(e) => setSelectedAilment(e.target.value)}
-            className="rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700"
+            className="rounded-xl border border-warm-300 px-2 py-1 text-sm text-warm-700"
           >
             <option value="all">All conditions</option>
             {data.ailments.map((a) => (
@@ -217,7 +217,7 @@ export default function HistoryPage() {
           </select>
         </div>
         {mergedAilmentData.length > 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-2xl border border-warm-200 bg-white p-4">
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={mergedAilmentData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -256,11 +256,11 @@ export default function HistoryPage() {
       {/* ── 2. Overall pain score ── */}
       <ErrorBoundary section="Overall Pain">
       <section className="mt-8">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-warm-900 mb-3">
           Overall Pain Score
         </h2>
         {data.overallPainTrend.length > 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-2xl border border-warm-200 bg-white p-4">
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={data.overallPainTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -295,11 +295,11 @@ export default function HistoryPage() {
       {/* ── 3. Exercise completion rate ── */}
       <ErrorBoundary section="Exercise Completion">
       <section className="mt-8">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-warm-900 mb-3">
           Exercise Completion Rate
         </h2>
         {data.exerciseCompletionRate.length > 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-2xl border border-warm-200 bg-white p-4">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.exerciseCompletionRate}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -329,10 +329,10 @@ export default function HistoryPage() {
               </BarChart>
             </ResponsiveContainer>
             {/* Summary stats */}
-            <div className="mt-3 flex gap-6 text-sm text-gray-500">
+            <div className="mt-3 flex gap-6 text-sm text-warm-500">
               <span>
                 Avg completion:{" "}
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-warm-900">
                   {Math.round(
                     data.exerciseCompletionRate.reduce(
                       (s, d) => s + d.rate,
@@ -344,7 +344,7 @@ export default function HistoryPage() {
               </span>
               <span>
                 Days exercised:{" "}
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-warm-900">
                   {data.exerciseCompletionRate.length}
                 </span>
               </span>
@@ -359,11 +359,11 @@ export default function HistoryPage() {
       {/* ── 4. Before/after pain comparison ── */}
       <ErrorBoundary section="Before/After Comparison">
       <section className="mt-8">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-warm-900 mb-3">
           Pain: Before vs After Exercise
         </h2>
         {data.beforeAfterComparison.length > 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-2xl border border-warm-200 bg-white p-4">
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={data.beforeAfterComparison}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -396,7 +396,7 @@ export default function HistoryPage() {
 
             {/* Exercise days vs rest days summary */}
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="rounded-md bg-green-50 border border-green-200 p-3 text-center">
+              <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-center">
                 <p className="text-xs text-green-700">Exercise days</p>
                 <p className="text-lg font-bold text-green-800">
                   {data.exerciseVsRest.exerciseDays.avgPain ?? "—"}
@@ -405,12 +405,12 @@ export default function HistoryPage() {
                   avg pain ({data.exerciseVsRest.exerciseDays.count} days)
                 </p>
               </div>
-              <div className="rounded-md bg-gray-50 border border-gray-200 p-3 text-center">
-                <p className="text-xs text-gray-600">Rest days</p>
-                <p className="text-lg font-bold text-gray-800">
+              <div className="rounded-xl bg-warm-50 border border-warm-200 p-3 text-center">
+                <p className="text-xs text-warm-600">Rest days</p>
+                <p className="text-lg font-bold text-warm-800">
                   {data.exerciseVsRest.restDays.avgPain ?? "—"}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-warm-500">
                   avg pain ({data.exerciseVsRest.restDays.count} days)
                 </p>
               </div>
@@ -425,9 +425,9 @@ export default function HistoryPage() {
       {/* ── 5. Body map heatmap ── */}
       <ErrorBoundary section="Body Heatmap">
       <section className="mt-8">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900 mb-3">
+        <h2 className="text-base md:text-lg font-semibold text-warm-900 mb-3">
           Body Pain Heatmap
-          <span className="ml-2 text-sm font-normal text-gray-500">
+          <span className="ml-2 text-sm font-normal text-warm-500">
             (avg over {days} days)
           </span>
         </h2>
@@ -446,7 +446,7 @@ export default function HistoryPage() {
 
 function EmptyChart({ message }: { message: string }) {
   return (
-    <div className="rounded-lg border-2 border-dashed border-gray-200 p-8 text-center text-sm text-gray-400">
+    <div className="rounded-2xl border-2 border-dashed border-warm-200 p-8 text-center text-sm text-warm-400">
       {message}
     </div>
   );
@@ -488,7 +488,7 @@ function painToTextColour(avgPain: number): string {
   if (avgPain >= 5) return "text-orange-800";
   if (avgPain >= 3) return "text-amber-800";
   if (avgPain >= 1) return "text-green-800";
-  return "text-gray-500";
+  return "text-warm-500";
 }
 
 function BodyHeatmap({ regions }: { regions: HeatmapRegion[] }) {
@@ -496,12 +496,12 @@ function BodyHeatmap({ regions }: { regions: HeatmapRegion[] }) {
   const sorted = [...regions].sort((a, b) => b.avgPain - a.avgPain);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4">
+    <div className="rounded-2xl border border-warm-200 bg-white p-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
         {sorted.map((r) => (
           <div
             key={r.region}
-            className="rounded-lg p-3 text-center"
+            className="rounded-2xl p-3 text-center"
             style={{ backgroundColor: painToColour(r.avgPain) }}
           >
             <p className={`text-xs font-medium ${painToTextColour(r.avgPain)}`}>
@@ -518,7 +518,7 @@ function BodyHeatmap({ regions }: { regions: HeatmapRegion[] }) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-gray-500">
+      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-warm-500">
         <div className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: "#bbf7d0" }} />
           <span>Low (1-2)</span>

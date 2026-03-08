@@ -4,15 +4,12 @@ import Nav from "@/components/shared/Nav";
 import Providers from "@/components/shared/Providers";
 import "./globals.css";
 
-const geistSans = localFont({
+// Use local Geist as base; Plus Jakarta Sans loads via CSS fallback on Vercel
+const geist = localFont({
   src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
+  variable: "--font-jakarta",
   weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,12 +25,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
-      >
+      <head>
+        {/* Plus Jakarta Sans — loads on Vercel/production */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${geist.variable} font-sans antialiased`}>
         <Providers>
           <Nav />
-          <main className="mx-auto max-w-5xl px-4 py-6 md:py-8 pb-20 md:pb-8">{children}</main>
+          <main className="mx-auto max-w-5xl px-4 py-6 md:py-8 pb-20 md:pb-8">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

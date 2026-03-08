@@ -164,7 +164,7 @@ export default function AilmentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {errors.length > 0 && (
-        <div className="rounded-md bg-red-50 border border-red-200 p-3">
+        <div className="rounded-xl bg-red-50 border border-red-200 p-3">
           <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
             {errors.map((err, i) => (
               <li key={i}>{err}</li>
@@ -175,7 +175,7 @@ export default function AilmentForm({
 
       {/* Name */}
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-warm-700">
           Name <span className="text-red-500">*</span>
         </label>
         <input
@@ -186,21 +186,21 @@ export default function AilmentForm({
           value={form.name}
           onChange={(e) => updateField("name", e.target.value)}
           placeholder="e.g. Lower back disc herniation"
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
         />
       </div>
 
       {/* Body Region + Severity row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="bodyRegion" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="bodyRegion" className="block text-sm font-medium text-warm-700">
             Body Region <span className="text-red-500">*</span>
           </label>
           <select
             id="bodyRegion"
             value={form.bodyRegion}
             onChange={(e) => updateField("bodyRegion", e.target.value as BodyRegion)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {BODY_REGION_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -211,14 +211,14 @@ export default function AilmentForm({
         </div>
 
         <div>
-          <label htmlFor="severityLevel" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="severityLevel" className="block text-sm font-medium text-warm-700">
             Severity
           </label>
           <select
             id="severityLevel"
             value={form.severityLevel}
             onChange={(e) => updateField("severityLevel", e.target.value as SeverityLevel)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {SEVERITY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -231,14 +231,14 @@ export default function AilmentForm({
 
       {/* Status */}
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="status" className="block text-sm font-medium text-warm-700">
           Status
         </label>
         <select
           id="status"
           value={form.status}
           onChange={(e) => updateField("status", e.target.value as AilmentStatus)}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -251,14 +251,14 @@ export default function AilmentForm({
       {/* Priority + Goal row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="priorityLevel" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="priorityLevel" className="block text-sm font-medium text-warm-700">
             Daily Plan Priority
           </label>
           <select
             id="priorityLevel"
             value={form.priorityLevel}
             onChange={(e) => updateField("priorityLevel", e.target.value as PriorityLevel)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {PRIORITY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -269,14 +269,14 @@ export default function AilmentForm({
         </div>
 
         <div>
-          <label htmlFor="goalTimeframe" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="goalTimeframe" className="block text-sm font-medium text-warm-700">
             Goal Timeframe
           </label>
           <select
             id="goalTimeframe"
             value={form.goalTimeframe}
             onChange={(e) => updateField("goalTimeframe", e.target.value as GoalTimeframe)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           >
             {GOAL_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -290,7 +290,7 @@ export default function AilmentForm({
       {/* Diagnosis + Date row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="diagnosis" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="diagnosis" className="block text-sm font-medium text-warm-700">
             Diagnosis
           </label>
           <input
@@ -300,12 +300,12 @@ export default function AilmentForm({
             value={form.diagnosis}
             onChange={(e) => updateField("diagnosis", e.target.value)}
             placeholder="Clinical diagnosis details"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           />
         </div>
 
         <div>
-          <label htmlFor="dateDiagnosed" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="dateDiagnosed" className="block text-sm font-medium text-warm-700">
             Date Diagnosed
           </label>
           <input
@@ -313,14 +313,14 @@ export default function AilmentForm({
             type="date"
             value={form.dateDiagnosed}
             onChange={(e) => updateField("dateDiagnosed", e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
           />
         </div>
       </div>
 
       {/* Notes */}
       <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="notes" className="block text-sm font-medium text-warm-700">
           Notes
         </label>
         <textarea
@@ -330,7 +330,7 @@ export default function AilmentForm({
           value={form.notes}
           onChange={(e) => updateField("notes", e.target.value)}
           placeholder="Additional context, triggers, observations..."
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-xl border border-warm-300 px-3 py-2 text-sm shadow-soft focus:border-sage-400 focus:outline-none focus:ring-1 focus:ring-sage-400"
         />
       </div>
 
@@ -339,7 +339,7 @@ export default function AilmentForm({
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center rounded-xl bg-sage-600 px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-sage-700 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting
             ? isEditing
@@ -352,7 +352,7 @@ export default function AilmentForm({
         <button
           type="button"
           onClick={onCancel ?? (() => router.push("/conditions"))}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-4 py-2 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2"
         >
           Cancel
         </button>

@@ -56,7 +56,6 @@ export default function BodyMap() {
     return <SkeletonBodyMap />;
   }
 
-  // Deduplicate regions for the list view (some appear in both front and back)
   const uniqueRegions = BODY_REGIONS.filter(
     (r, i, arr) => arr.findIndex((x) => x.id === r.id) === i
   );
@@ -69,20 +68,20 @@ export default function BodyMap() {
       <div className="flex md:hidden gap-1 justify-center">
         <button
           onClick={() => setMobileView("svg")}
-          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+          className={`rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
             mobileView === "svg"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-600"
+              ? "bg-sage-600 text-white shadow-soft"
+              : "bg-warm-100 text-warm-600"
           }`}
         >
           Body View
         </button>
         <button
           onClick={() => setMobileView("list")}
-          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+          className={`rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
             mobileView === "list"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-600"
+              ? "bg-sage-600 text-white shadow-soft"
+              : "bg-warm-100 text-warm-600"
           }`}
         >
           Region List
@@ -91,16 +90,15 @@ export default function BodyMap() {
 
       <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
         {/* ── SVG Body Maps ── */}
-        {/* Desktop: always show. Mobile: only when mobileView === "svg" */}
         <div className={`flex flex-col sm:flex-row gap-4 justify-center flex-1 ${mobileView === "list" ? "hidden md:flex" : ""}`}>
           {/* Front View */}
           <div className="flex flex-col items-center">
-            <span className="mb-1 md:mb-2 text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">
+            <span className="mb-2 text-xs font-semibold text-warm-400 uppercase tracking-widest">
               Front
             </span>
             <svg
-              viewBox="0 0 200 450"
-              className="h-[300px] sm:h-[400px] md:h-[500px] w-auto touch-manipulation"
+              viewBox="0 0 200 460"
+              className="h-[320px] sm:h-[420px] md:h-[520px] w-auto touch-manipulation"
               aria-label="Front body view"
             >
               <FrontOutline />
@@ -121,12 +119,12 @@ export default function BodyMap() {
 
           {/* Back View */}
           <div className="flex flex-col items-center">
-            <span className="mb-1 md:mb-2 text-xs md:text-sm font-medium text-gray-500 uppercase tracking-wide">
+            <span className="mb-2 text-xs font-semibold text-warm-400 uppercase tracking-widest">
               Back
             </span>
             <svg
-              viewBox="0 0 200 450"
-              className="h-[300px] sm:h-[400px] md:h-[500px] w-auto touch-manipulation"
+              viewBox="0 0 200 460"
+              className="h-[320px] sm:h-[420px] md:h-[520px] w-auto touch-manipulation"
               aria-label="Back body view"
             >
               <BackOutline />
@@ -146,37 +144,36 @@ export default function BodyMap() {
           </div>
         </div>
 
-        {/* ── Mobile region list (alternative to SVG tapping) ── */}
+        {/* ── Mobile region list ── */}
         <div className={`md:hidden flex-1 ${mobileView === "svg" ? "hidden" : ""}`}>
           <div className="grid grid-cols-2 gap-2">
             {uniqueRegions.map((region) => {
               const colour = getColourForRegion(region.id);
-              const ailmentCount =
-                regions[region.id]?.ailments.length ?? 0;
+              const ailmentCount = regions[region.id]?.ailments.length ?? 0;
               const isSelected = selectedRegion === region.id;
               return (
                 <button
                   key={region.id}
                   onClick={() => handleRegionClick(region.id)}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-left transition-all active:scale-[0.98] ${
+                  className={`flex items-center gap-2.5 rounded-xl border p-3 text-left transition-all active:scale-[0.98] ${
                     isSelected
-                      ? "border-blue-400 bg-blue-50 ring-1 ring-blue-400"
-                      : "border-gray-200 bg-white"
+                      ? "border-sage-400 bg-sage-50 ring-1 ring-sage-400"
+                      : "border-warm-200 bg-white"
                   }`}
                 >
                   <div
-                    className="h-3 w-3 shrink-0 rounded-full border"
+                    className="h-3.5 w-3.5 shrink-0 rounded-full"
                     style={{
                       backgroundColor: colour.fill,
-                      borderColor: colour.stroke,
+                      border: `1.5px solid ${colour.stroke}`,
                     }}
                   />
                   <div className="min-w-0">
-                    <p className="text-xs font-medium text-gray-900 truncate">
+                    <p className="text-xs font-semibold text-warm-800 truncate">
                       {region.label}
                     </p>
                     {ailmentCount > 0 && (
-                      <p className="text-[10px] text-gray-500">
+                      <p className="text-[10px] text-warm-500">
                         {ailmentCount} ailment{ailmentCount !== 1 ? "s" : ""}
                       </p>
                     )}
@@ -196,8 +193,8 @@ export default function BodyMap() {
               onClose={() => setSelectedRegion(null)}
             />
           ) : (
-            <div className="rounded-lg border-2 border-dashed border-gray-200 p-4 md:p-6 text-center">
-              <p className="text-sm text-gray-400">
+            <div className="rounded-2xl border-2 border-dashed border-warm-200 p-6 text-center">
+              <p className="text-sm text-warm-400">
                 {mobileView === "list"
                   ? "Tap a region to view ailments"
                   : "Tap a body region to view ailments"}
@@ -205,10 +202,10 @@ export default function BodyMap() {
             </div>
           )}
 
-          {/* Region hover tooltip (desktop only) */}
+          {/* Region hover tooltip (desktop) */}
           {hoveredRegion && hoveredRegion !== selectedRegion && (
-            <div className="hidden md:block mt-3 rounded-md bg-gray-50 px-3 py-2 text-center">
-              <p className="text-xs text-gray-500">
+            <div className="hidden md:block mt-3 rounded-xl bg-warm-100 px-4 py-2.5 text-center">
+              <p className="text-xs font-medium text-warm-600">
                 {FRONT_REGIONS.find((r) => r.id === hoveredRegion)?.label ??
                   BACK_REGIONS.find((r) => r.id === hoveredRegion)?.label ??
                   hoveredRegion}

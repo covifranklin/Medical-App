@@ -22,9 +22,10 @@ export default function BodyRegionPath({
   onMouseEnter,
   onMouseLeave,
 }: BodyRegionPathProps) {
+  // Warm sage/teal tones for selection instead of cold blue
   const strokeWidth = isSelected ? 2.5 : isHovered ? 2 : 1;
-  const strokeColour = isSelected ? "#1d4ed8" : isHovered ? "#3b82f6" : colour.stroke;
-  const opacity = isHovered ? 0.85 : 0.7;
+  const strokeColour = isSelected ? "#4A7050" : isHovered ? "#5E8A5E" : colour.stroke;
+  const opacity = isHovered ? 0.9 : 0.75;
 
   return (
     <path
@@ -33,7 +34,9 @@ export default function BodyRegionPath({
       fillOpacity={opacity}
       stroke={strokeColour}
       strokeWidth={strokeWidth}
-      className="cursor-pointer transition-all duration-150"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="cursor-pointer transition-all duration-200"
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

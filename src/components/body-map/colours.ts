@@ -6,16 +6,16 @@ export interface RegionColour {
   label: string;
 }
 
+// Warm, muted tones that feel gentle rather than clinical
 const COLOUR_MAP: Record<string, RegionColour> = {
-  none: { fill: "#e5e7eb", stroke: "#d1d5db", label: "No issues" },
-  managed: { fill: "#86efac", stroke: "#4ade80", label: "Managed / Mild" },
-  moderate: { fill: "#fdba74", stroke: "#fb923c", label: "Niggling / Moderate" },
-  severe: { fill: "#fca5a5", stroke: "#f87171", label: "Serious / Acute" },
+  none: { fill: "#F0EDE8", stroke: "#D4CDC4", label: "No issues" },
+  managed: { fill: "#C8D9C8", stroke: "#A3BFA3", label: "Managed / Mild" },
+  moderate: { fill: "#F5D5A8", stroke: "#E8B878", label: "Niggling / Moderate" },
+  severe: { fill: "#E8AEA8", stroke: "#D48880", label: "Serious / Acute" },
 };
 
 /**
  * Determine the colour for a body region based on the worst active ailment.
- * Priority: CRITICAL/SEVERE > MODERATE > MILD > MANAGED status > no issues
  */
 export function getRegionColour(
   ailments: Array<{ severityLevel: SeverityLevel; status: AilmentStatus }>
@@ -25,7 +25,6 @@ export function getRegionColour(
   const active = ailments.filter((a) => a.status !== "RESOLVED");
   if (active.length === 0) return COLOUR_MAP.none;
 
-  // Find worst severity among active ailments
   const severityOrder: SeverityLevel[] = ["CRITICAL", "SEVERE", "MODERATE", "MILD"];
   let worstSeverity: SeverityLevel = "MILD";
   for (const level of severityOrder) {
@@ -35,7 +34,6 @@ export function getRegionColour(
     }
   }
 
-  // Also check if all active are MANAGED status
   const allManaged = active.every((a) => a.status === "MANAGED");
 
   if (worstSeverity === "CRITICAL" || worstSeverity === "SEVERE") {

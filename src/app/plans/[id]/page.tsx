@@ -238,10 +238,10 @@ export default function PlanDetailPage({
   if (error || !plan) {
     return (
       <div>
-        <Link href="/conditions" className="text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/conditions" className="text-sm text-warm-500 hover:text-warm-700">
           &larr; Back to Ailments
         </Link>
-        <div className="mt-6 rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+        <div className="mt-6 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">
           {error ?? "Treatment plan not found."}
         </div>
       </div>
@@ -261,12 +261,12 @@ export default function PlanDetailPage({
       <div>
         <Link
           href={`/conditions/${plan.ailmentId}`}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          className="text-sm text-warm-500 hover:text-warm-700"
         >
           &larr; Back to {plan.ailment.name}
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-gray-900">Edit Treatment Plan</h1>
-        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <h1 className="mt-2 text-2xl font-bold text-warm-900">Edit Treatment Plan</h1>
+        <div className="mt-4 rounded-2xl border border-warm-200 bg-white p-6 shadow-soft">
           <PlanForm
             ailmentId={plan.ailmentId}
             initialData={formData}
@@ -287,7 +287,7 @@ export default function PlanDetailPage({
     <div>
       <Link
         href={`/conditions/${plan.ailmentId}`}
-        className="text-sm text-gray-500 hover:text-gray-700"
+        className="text-sm text-warm-500 hover:text-warm-700"
       >
         &larr; Back to {plan.ailment.name}
       </Link>
@@ -295,8 +295,8 @@ export default function PlanDetailPage({
       {/* Header */}
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{plan.title}</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-warm-900">{plan.title}</h1>
+          <p className="mt-1 text-sm text-warm-500">
             {plan.prescribedBy && <>Prescribed by {plan.prescribedBy} &middot; </>}
             {FREQUENCY_LABEL[plan.frequency] ?? plan.frequency} &middot; since {plan.startDate}
           </p>
@@ -323,13 +323,13 @@ export default function PlanDetailPage({
       <div className="mt-4 flex gap-2">
         <button
           onClick={() => setEditing(true)}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-3 py-1.5 text-sm font-medium text-warm-700 shadow-soft hover:bg-warm-50"
         >
           Edit
         </button>
         <button
           onClick={() => setShowDeleteConfirm(true)}
-          className="inline-flex items-center rounded-md border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50"
+          className="inline-flex items-center rounded-xl border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-600 shadow-soft hover:bg-red-50"
         >
           Delete
         </button>
@@ -337,7 +337,7 @@ export default function PlanDetailPage({
 
       {/* Delete confirmation */}
       {showDeleteConfirm && (
-        <div className="mt-3 rounded-md border border-red-200 bg-red-50 p-4">
+        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-sm text-red-700">
             Delete &ldquo;{plan.title}&rdquo;? This will also remove all
             linked exercises. This cannot be undone.
@@ -346,13 +346,13 @@ export default function PlanDetailPage({
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+              className="inline-flex items-center rounded-xl bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
             >
               {deleting ? "Deleting..." : "Yes, delete"}
             </button>
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex items-center rounded-xl border border-warm-300 bg-white px-3 py-1.5 text-sm font-medium text-warm-700 hover:bg-warm-50"
             >
               Cancel
             </button>
@@ -361,55 +361,55 @@ export default function PlanDetailPage({
       )}
 
       {/* Plan Info card */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-900 mb-3">Plan Info</h2>
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
+        <h2 className="text-sm font-semibold text-warm-900 mb-3">Plan Info</h2>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div>
-            <dt className="text-gray-500">Ailment</dt>
+            <dt className="text-warm-500">Ailment</dt>
             <dd>
-              <Link href={`/conditions/${plan.ailment.id}`} className="text-gray-900 hover:text-blue-600">
+              <Link href={`/conditions/${plan.ailment.id}`} className="text-warm-900 hover:text-sage-600">
                 {plan.ailment.name}
               </Link>
-              <span className="ml-2 text-xs text-gray-500">
+              <span className="ml-2 text-xs text-warm-500">
                 {REGION_LABELS[plan.ailment.bodyRegion] ?? plan.ailment.bodyRegion}
               </span>
             </dd>
           </div>
           <div>
-            <dt className="text-gray-500">Frequency</dt>
-            <dd className="text-gray-900">{FREQUENCY_LABEL[plan.frequency] ?? plan.frequency}</dd>
+            <dt className="text-warm-500">Frequency</dt>
+            <dd className="text-warm-900">{FREQUENCY_LABEL[plan.frequency] ?? plan.frequency}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">Start Date</dt>
-            <dd className="text-gray-900">{plan.startDate}</dd>
+            <dt className="text-warm-500">Start Date</dt>
+            <dd className="text-warm-900">{plan.startDate}</dd>
           </div>
           {plan.prescribedBy && (
             <div>
-              <dt className="text-gray-500">Prescribed By</dt>
-              <dd className="text-gray-900">{plan.prescribedBy}</dd>
+              <dt className="text-warm-500">Prescribed By</dt>
+              <dd className="text-warm-900">{plan.prescribedBy}</dd>
             </div>
           )}
           <div>
-            <dt className="text-gray-500">Created</dt>
-            <dd className="text-gray-900">{new Date(plan.createdAt).toLocaleDateString()}</dd>
+            <dt className="text-warm-500">Created</dt>
+            <dd className="text-warm-900">{new Date(plan.createdAt).toLocaleDateString()}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">Last updated</dt>
-            <dd className="text-gray-900">{new Date(plan.updatedAt).toLocaleDateString()}</dd>
+            <dt className="text-warm-500">Last updated</dt>
+            <dd className="text-warm-900">{new Date(plan.updatedAt).toLocaleDateString()}</dd>
           </div>
         </dl>
       </div>
 
       {/* Exercises section */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900">
+          <h2 className="text-sm font-semibold text-warm-900">
             Exercises ({plan.exercises.length})
           </h2>
           {!showAddExercise && !editingExerciseId && (
             <button
               onClick={() => setShowAddExercise(true)}
-              className="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700"
+              className="inline-flex items-center rounded-xl bg-sage-600 px-3 py-1.5 text-xs font-medium text-white shadow-soft hover:bg-sage-700"
             >
               + Add Exercise
             </button>
@@ -418,8 +418,8 @@ export default function PlanDetailPage({
 
         {/* Add exercise form */}
         {showAddExercise && (
-          <div className="mb-4 rounded-md border border-blue-200 bg-blue-50/30 p-4">
-            <h3 className="text-sm font-medium text-gray-900 mb-3">New Exercise</h3>
+          <div className="mb-4 rounded-xl border border-sage-200 bg-sage-50/30 p-4">
+            <h3 className="text-sm font-medium text-warm-900 mb-3">New Exercise</h3>
             <ExerciseForm
               planId={plan.id}
               defaultBodyRegion={plan.ailment.bodyRegion}
@@ -434,11 +434,11 @@ export default function PlanDetailPage({
 
         {/* Exercise list */}
         {plan.exercises.length === 0 && !showAddExercise ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-warm-500">
             No exercises added yet.{" "}
             <button
               onClick={() => setShowAddExercise(true)}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-sage-600 hover:text-sage-700"
             >
               Add your first exercise
             </button>
@@ -449,8 +449,8 @@ export default function PlanDetailPage({
               <li key={ex.id}>
                 {editingExerciseId === ex.id ? (
                   /* Inline edit form */
-                  <div className="rounded-md border border-blue-200 bg-blue-50/30 p-4">
-                    <h3 className="text-sm font-medium text-gray-900 mb-3">Edit Exercise</h3>
+                  <div className="rounded-xl border border-sage-200 bg-sage-50/30 p-4">
+                    <h3 className="text-sm font-medium text-warm-900 mb-3">Edit Exercise</h3>
                     <ExerciseForm
                       planId={plan.id}
                       defaultBodyRegion={plan.ailment.bodyRegion}
@@ -476,43 +476,43 @@ export default function PlanDetailPage({
                   </div>
                 ) : (
                   /* Exercise card */
-                  <div className="rounded-md border border-gray-100 p-3 hover:border-gray-300 hover:shadow-sm transition-all">
+                  <div className="rounded-xl border border-warm-100 p-3 hover:border-warm-300 hover:shadow-soft transition-all">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs font-mono text-gray-400 shrink-0 w-5 text-right">
+                        <span className="text-xs font-mono text-warm-400 shrink-0 w-5 text-right">
                           {idx + 1}.
                         </span>
-                        <span className="text-sm font-medium text-gray-900 truncate">
+                        <span className="text-sm font-medium text-warm-900 truncate">
                           {ex.name}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0 text-xs text-gray-500">
+                      <div className="flex items-center gap-1.5 shrink-0 text-xs text-warm-500">
                         {ex.sets && ex.reps && (
-                          <span className="rounded bg-gray-100 px-1.5 py-0.5 font-medium">
+                          <span className="rounded bg-warm-100 px-1.5 py-0.5 font-medium">
                             {ex.sets}&times;{ex.reps}
                           </span>
                         )}
                         {ex.holdSeconds && (
-                          <span className="rounded bg-gray-100 px-1.5 py-0.5 font-medium">
+                          <span className="rounded bg-warm-100 px-1.5 py-0.5 font-medium">
                             {ex.holdSeconds}s hold
                           </span>
                         )}
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5">
+                        <span className="rounded bg-warm-100 px-1.5 py-0.5">
                           {ex.durationMinutes} min
                         </span>
                       </div>
                     </div>
 
                     {ex.description && (
-                      <p className="mt-1 ml-7 text-xs text-gray-600">{ex.description}</p>
+                      <p className="mt-1 ml-7 text-xs text-warm-600">{ex.description}</p>
                     )}
 
                     <div className="mt-1.5 ml-7 flex flex-wrap items-center gap-2 text-xs">
-                      <span className="text-gray-500">
+                      <span className="text-warm-500">
                         {REGION_LABELS[ex.targetBodyRegion] ?? ex.targetBodyRegion}
                       </span>
                       {ex.frequencyPerWeek && (
-                        <span className="text-gray-500">
+                        <span className="text-warm-500">
                           {ex.frequencyPerWeek}x/week
                         </span>
                       )}
@@ -526,7 +526,7 @@ export default function PlanDetailPage({
                           href={ex.videoUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-sage-600 hover:text-sage-700"
                         >
                           Video
                         </a>
@@ -539,7 +539,7 @@ export default function PlanDetailPage({
                       <button
                         onClick={() => handleMoveExercise(ex.id, "up")}
                         disabled={idx === 0 || reordering}
-                        className="inline-flex items-center rounded px-1.5 py-0.5 text-xs text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        className="inline-flex items-center rounded px-1.5 py-0.5 text-xs text-warm-500 hover:bg-warm-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                         title="Move up"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -549,7 +549,7 @@ export default function PlanDetailPage({
                       <button
                         onClick={() => handleMoveExercise(ex.id, "down")}
                         disabled={idx === plan.exercises.length - 1 || reordering}
-                        className="inline-flex items-center rounded px-1.5 py-0.5 text-xs text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        className="inline-flex items-center rounded px-1.5 py-0.5 text-xs text-warm-500 hover:bg-warm-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                         title="Move down"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
@@ -557,11 +557,11 @@ export default function PlanDetailPage({
                         </svg>
                       </button>
 
-                      <span className="mx-1 h-3 border-l border-gray-200" />
+                      <span className="mx-1 h-3 border-l border-warm-200" />
 
                       <button
                         onClick={() => setEditingExerciseId(ex.id)}
-                        className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                        className="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium text-warm-600 hover:bg-warm-100 transition-colors"
                       >
                         Edit
                       </button>
@@ -582,13 +582,13 @@ export default function PlanDetailPage({
       </div>
 
       {/* AI Review section */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900">AI Review</h2>
+          <h2 className="text-sm font-semibold text-warm-900">AI Review</h2>
           <button
             onClick={handleRequestReview}
             disabled={reviewing}
-            className="inline-flex items-center rounded-md bg-purple-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center rounded-xl bg-purple-600 px-3 py-1.5 text-xs font-medium text-white shadow-soft hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {reviewing ? (
               <>
@@ -607,7 +607,7 @@ export default function PlanDetailPage({
         </div>
 
         {reviewError && (
-          <div className="mb-3 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+          <div className="mb-3 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
             {reviewError}
           </div>
         )}
@@ -621,7 +621,7 @@ export default function PlanDetailPage({
             )}
           />
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-warm-500">
             No AI review yet. Click &ldquo;Get AI Review&rdquo; to analyse this plan against evidence-based practices
             and check for cross-condition interactions.
           </p>
@@ -630,9 +630,9 @@ export default function PlanDetailPage({
 
       {/* Raw plan content */}
       {plan.rawContent && (
-        <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900 mb-3">Plan Content</h2>
-          <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono bg-gray-50 rounded-md p-4 max-h-96 overflow-y-auto">
+        <div className="mt-6 rounded-2xl border border-warm-200 bg-white p-5 shadow-soft">
+          <h2 className="text-sm font-semibold text-warm-900 mb-3">Plan Content</h2>
+          <pre className="whitespace-pre-wrap text-sm text-warm-700 font-mono bg-warm-50 rounded-xl p-4 max-h-96 overflow-y-auto">
             {plan.rawContent}
           </pre>
         </div>
